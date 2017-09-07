@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.5.6.RELEASE</version>
+		<relativePath /> <!-- lookup parent from repository -->
+	</parent>
+
+	<artifactId>spring-boot-starter-disruptor</artifactId>
+	<packaging>jar</packaging>
+	
+	<name>spring-boot-starter-disruptor</name>
+	<url></url>
+	<description>starter for disruptor</description>
+	
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>1.8</java.version>
+		<javax.servlet-api.version>3.1.0</javax.servlet-api.version>
+		<disruptor.version>3.3.6</disruptor.version>
+	</properties>
+
+	<dependencies>
+
+		<!-- Java Servlet API -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+		<!-- Core starter, including auto-configuration support, logging and YAML -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- 引入log4j2依赖 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-log4j2</artifactId>
+		</dependency>
+		<!-- 加上这个才能辨认到log4j2.yml文件 -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-yaml</artifactId>
+		</dependency>
+		<!-- Spring Boot Test 依赖 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<!-- @ConfigurationProperties annotation processing (metadata for IDEs) -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<!-- Compile dependencies -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-autoconfigure</artifactId>
+		</dependency>
+		
+        <!-- Disruptor它是一个开源的并发框架,并获得2011 Duke’s 程序框架创新奖,能够在无锁的情况下实现网络的Queue并发操作。 -->
+		<dependency>
+		    <groupId>com.lmax</groupId>
+		    <artifactId>disruptor</artifactId>
+		    <version>${disruptor.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.6</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+		</dependency>
+		
+	</dependencies>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<!-- 编译插件：编译主代码至主输出目录 -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<!-- 设置源文件编码方式 -->
+					<configuration>
+						<defaultLibBundleDir>lib</defaultLibBundleDir>
+						<!-- 源代码编译版本 -->
+						<source>${java.version}</source>
+						<!-- 目标平台编译版本 -->
+						<target>${java.version}</target>
+						<!-- 字符集编码 -->
+						<encoding>${project.build.sourceEncoding}</encoding>
+						<!-- -->
+						<maxmem>512M</maxmem>
+					</configuration>
+				</plugin>
+				<!-- 资源插件：复制主资源文件至主输出目录 -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<!-- 解决资源文件的编码问题 -->
+					<configuration>
+						<!-- 字符集编码 -->
+						<encoding>${project.build.sourceEncoding}</encoding>
+					</configuration>
+					<!-- 复制测试资源文件至测试输出目录复制resources到test-classess -->
+					<executions>
+						<execution>
+							<id>copy-resources</id>
+							<phase>validate</phase>
+							<goals>
+								<goal>copy-resources</goal>
+							</goals>
+							<configuration>
+								<outputDirectory>${basedir}/target/test-classes</outputDirectory>
+								<resources>
+									<resource>
+										<directory>src/main/resources</directory>
+										<!--<filtering>true</filtering> -->
+									</resource>
+								</resources>
+							</configuration>
+						</execution>
+					</executions>
+					<dependencies>
+						<dependency>
+							<groupId>org.apache.maven.shared</groupId>
+							<artifactId>maven-filtering</artifactId>
+							<version>1.3</version>
+						</dependency>
+					</dependencies>
+				</plugin>
+				<!-- 单元测试插件 ：执行测试用例 -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<configuration>
+						<!-- 跳过单元测试 -->
+						<skip>true</skip>
+						<skipTests>true</skipTests>
+						<!-- forkMode 可设置值有 “never”， “once”， “always” 和 “pertest”。 pretest： 
+							每一个测试创建一个新进程，为每个测试创建新的JVM是单独测试的最彻底方式，但也是最慢的，不适合hudson上持续回归。 once：在一个进程中进行所有测试。once为默认设置，在Hudson上持续回归时建议使用默认设置。 
+							always：在一个进程中并行的运行脚本，Junit4.7以上版本才可以使用，surefire的版本要在2.6以上提供这个功能，其中 threadCount：执行时，指定可分配的线程数量。只和参数parallel配合使用有效。默认：5。 -->
+						<forkMode>once</forkMode>
+						<argLine>-Xmx1024m -XX:PermSize=256m -XX:MaxPermSize=256m</argLine>
+						<additionalClasspathElements>
+							<additionalClasspathElement>
+								${basedir}/target/test-classes
+							</additionalClasspathElement>
+						</additionalClasspathElements>
+					</configuration>
+				</plugin>
+				<!-- jar包生成插件 ：创建项目jar包 -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<!-- 打包jar文件时，配置manifest文件，加入lib包的jar依赖 -->
+					<configuration>
+						<archive>
+							<manifest>
+								<addClasspath>true</addClasspath>
+								<classpathPrefix>lib/</classpathPrefix>
+							</manifest>
+						</archive>
+					</configuration>
+				</plugin>
+				<!-- 安装插件：将项目输出构件安装到本地仓库 -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-install-plugin</artifactId>
+				</plugin>
+				<!-- 发布插件 ：将项目输出构件部署到远程仓库 -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-deploy-plugin</artifactId>
+				</plugin>
+				<!-- 源码插件:发布时自动将源码同时发布 -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<!-- 打包source文件为jar文件 -->
+					<configuration>
+						<testFailureIgnore>true</testFailureIgnore>
+						<attach>true</attach>
+						<encoding>${project.build.sourceEncoding}</encoding>
+					</configuration>
+					<executions>
+						<execution>
+							<id>attach-sources</id>
+							<phase>package</phase>
+							<goals>
+								<goal>jar-no-fork</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<!-- 文档插件:发布时自动生成文档 : http://codepub.cn/2016/10/18/Java-8-configure-maven-java-doc-plugin/ -->	
+				<plugin>  
+		            <groupId>org.apache.maven.plugins</groupId>  
+		            <artifactId>maven-javadoc-plugin</artifactId>  
+		            <version>2.10.4</version> 
+					<configuration>  
+	                    <aggregate>true</aggregate>  
+	                    <argLine>-Dfile.encoding=UTF-8</argLine>
+                       	<charset>${project.build.sourceEncoding}</charset> 
+                        <encoding>${project.build.sourceEncoding}</encoding> 
+                        <docencoding>${project.build.sourceEncoding}</docencoding> 
+	                </configuration>
+					<executions>
+						<execution>
+							<id>attach-javadocs</id>
+							<phase>package</phase>
+							<goals>
+								<goal>jar</goal>
+							</goals>
+							<configuration>
+								<additionalparam>-Xdoclint:none</additionalparam>
+							</configuration>
+						</execution>
+					</executions>				
+		        </plugin>
+			</plugins>
+		</pluginManagement>
+		<plugins>
+			<!-- 资源插件：复制主资源文件至主输出目录 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+			</plugin>
+			<!-- 编译插件：编译主代码至主输出目录 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
+			<!-- 单元测试插件 ：执行测试用例 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+			</plugin>
+			<!-- jar包生成插件 ：创建项目jar包 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+			</plugin>
+			<!-- 安装插件：将项目输出构件安装到本地仓库 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+			</plugin>
+			<!-- 发布插件 ：将项目输出构件部署到远程仓库 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+			</plugin>
+			<!-- 源码插件:发布时自动将源码同时发布 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+
+</project>

@@ -1,0 +1,18 @@
+server:
+  tomcat:
+    max-threads: 100
+    min-spare-threads: 20
+  connection-timeout: 5000
+  ssl:
+    key-store: classpath:.keystore
+    key-store-type: JKS
+    key-password: qq123456
+    key-alias: tomcat
+  port: 8080
+spring:  
+  disruptor: 
+    enabled: true
+    ring-buffer-size: 1024
+    ring-thread-numbers: 4
+    multi-producer: true
+        

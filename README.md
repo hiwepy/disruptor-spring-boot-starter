@@ -1,2 +1,2 @@
-# spring-boot-starter-disruptor
-starter for disruptor 
+# spring-boot-starter-rocketmq
+starter for rocketmq
