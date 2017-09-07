@@ -2,12 +2,11 @@ package com.lmax.disruptor.spring.boot.handler;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.lmax.disruptor.spring.boot.event.DisruptorEvent;
+import com.lmax.disruptor.spring.boot.exception.EventHandleException;
 import com.lmax.disruptor.spring.boot.handler.chain.HandlerChain;
 import com.lmax.disruptor.spring.boot.handler.chain.HandlerChainResolver;
 
@@ -38,14 +37,11 @@ public class AbstractRouteableEventHandler<T extends DisruptorEvent> extends Abs
 			t = throwable;
 		}
 		if (t != null) {
-			if (t instanceof ServletException) {
-				throw (ServletException) t;
-			}
 			if (t instanceof IOException) {
 				throw (IOException) t;
 			}
 			String msg = "Handlered event failed.";
-			throw new ServletException(msg, t);
+			throw new EventHandleException(msg, t);
 		}
 	}
 
