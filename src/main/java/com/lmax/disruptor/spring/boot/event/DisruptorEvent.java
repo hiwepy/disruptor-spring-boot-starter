@@ -8,7 +8,7 @@ public abstract class DisruptorEvent extends EventObject {
 	/** System time when the event happened */
 	private final long timestamp;
 	
-	private String expression;
+	private String ruleExpression;
 	
 	/**
 	 * Create a new ConsumeEvent.
@@ -26,13 +26,12 @@ public abstract class DisruptorEvent extends EventObject {
 		return this.timestamp;
 	}
 
-	public String getExpression() {
-		return expression;
+	public String getRuleExpression() {
+		return ruleExpression;
 	}
 
-	public void setExpression(String expression) {
-		this.expression = expression;
+	public void setRuleExpression(String ruleExpression) {
+		this.ruleExpression = ruleExpression;
 	}
-	
 	
 }
