@@ -26,17 +26,17 @@ public class ProxiedHandlerChain implements HandlerChain<DisruptorEvent> {
     }
 
     @Override
-	public void onEvent(DisruptorEvent event) throws Exception {
+	public void doHandler(DisruptorEvent event) throws Exception {
         if (this.handlers == null || this.handlers.size() == this.index) {
             if (LOG.isTraceEnabled()) {
                 LOG.trace("Invoking original filter chain.");
             }
-            this.orig.onEvent(event);
+            this.orig.doHandler(event);
         } else {
             if (LOG.isTraceEnabled()) {
                 LOG.trace("Invoking wrapped filter at index [" + this.index + "]");
             }
-            this.handlers.get(this.index++).onEvent(event, this);
+            this.handlers.get(this.index++).doHandler(event, this);
         }
     }
     

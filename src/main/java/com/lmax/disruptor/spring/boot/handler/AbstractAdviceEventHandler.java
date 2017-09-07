@@ -21,7 +21,7 @@ public class AbstractAdviceEventHandler<T extends DisruptorEvent> extends Abstra
 	}
 
 	protected void executeChain(T event, HandlerChain<T> chain) throws Exception {
-		chain.onEvent(event);
+		chain.doHandler(event);
 	}
 
 	@Override
@@ -30,7 +30,7 @@ public class AbstractAdviceEventHandler<T extends DisruptorEvent> extends Abstra
 		if (!isEnabled(event)) {
         	LOG.debug("Handler '{}' is not enabled for the current event.  Proceeding without invoking this handler.", getName());
         	// Proceed without invoking this handler...
-            handlerChain.onEvent(event);
+            handlerChain.doHandler(event);
 		} else {
 			
 			LOG.trace("Handler '{}' enabled.  Executing now.", getName());

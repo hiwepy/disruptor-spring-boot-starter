@@ -5,6 +5,6 @@ import com.lmax.disruptor.spring.boot.handler.chain.HandlerChain;
 
 public interface DisruptorHandler<T extends DisruptorEvent> {
 
-	public void onEvent(T event, HandlerChain<T> handlerChain) throws Exception;
+	public void doHandler(T event, HandlerChain<T> handlerChain) throws Exception;
 	
 }

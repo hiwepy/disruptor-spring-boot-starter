@@ -24,7 +24,7 @@ public class DisruptorEventHandler extends AbstractRouteableEventHandler<Disrupt
 		HandlerChain<DisruptorEvent> originalChain = new HandlerChain<DisruptorEvent>() {
 			
 			@Override
-			public void onEvent(DisruptorEvent event) throws Exception {
+			public void doHandler(DisruptorEvent event) throws Exception {
 				
 			}
 			

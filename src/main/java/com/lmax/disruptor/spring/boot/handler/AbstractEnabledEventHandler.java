@@ -14,13 +14,13 @@ public abstract class AbstractEnabledEventHandler<T extends DisruptorEvent> exte
 	protected abstract void doHandlerInternal(T event, HandlerChain<T> handlerChain) throws Exception;
 
 	@Override
-	public void onEvent(T event, HandlerChain<T> handlerChain) throws Exception {
+	public void doHandler(T event, HandlerChain<T> handlerChain) throws Exception {
 
 		if (!isEnabled(event)) {
 			LOG.debug("Handler '{}' is not enabled for the current event.  Proceeding without invoking this handler.",
 					getName());
 			// Proceed without invoking this handler...
-			handlerChain.onEvent(event);
+			handlerChain.doHandler(event);
 		} else {
 			LOG.trace("Handler '{}' enabled.  Executing now.", getName());
 			doHandlerInternal(event, handlerChain);
