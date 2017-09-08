@@ -12,31 +12,37 @@ public class ProxiedHandlerChain implements HandlerChain<DisruptorEvent> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ProxiedHandlerChain.class);
 	
-    private ProxiedHandlerChain orig;
+    private ProxiedHandlerChain originalChain;
     private List<DisruptorHandler<DisruptorEvent>> handlers;
-    private int index = 0;
+    private int currentPosition = 0;
 
+    public ProxiedHandlerChain() {
+        this.currentPosition = -1;
+    }
+    
     public ProxiedHandlerChain(ProxiedHandlerChain orig, List<DisruptorHandler<DisruptorEvent>> handlers) {
         if (orig == null) {
             throw new NullPointerException("original HandlerChain cannot be null.");
         }
-        this.orig = orig;
+        this.originalChain = orig;
         this.handlers = handlers;
-        this.index = 0;
+        this.currentPosition = 0;
     }
 
     @Override
 	public void doHandler(DisruptorEvent event) throws Exception {
-        if (this.handlers == null || this.handlers.size() == this.index) {
+        if (this.handlers == null || this.handlers.size() == this.currentPosition) {
             if (LOG.isTraceEnabled()) {
                 LOG.trace("Invoking original filter chain.");
             }
-            this.orig.doHandler(event);
+            if(this.originalChain != null) {
+            	this.originalChain.doHandler(event);
+            }
         } else {
             if (LOG.isTraceEnabled()) {
-                LOG.trace("Invoking wrapped filter at index [" + this.index + "]");
+                LOG.trace("Invoking wrapped filter at index [" + this.currentPosition + "]");
             }
-            this.handlers.get(this.index++).doHandler(event, this);
+            this.handlers.get(this.currentPosition++).doHandler(event, this);
         }
     }
     
