@@ -69,7 +69,7 @@ public class PathMatchingHandlerChainResolver implements HandlerChainResolver<Di
     }
 
     protected String getPathWithinEvent(DisruptorEvent event) {
-    	return event.getRuleExpression();
+    	return event.getRouteExpression();
     }
 	
 }

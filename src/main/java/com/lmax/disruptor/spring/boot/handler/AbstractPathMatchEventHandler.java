@@ -26,7 +26,7 @@ public abstract class AbstractPathMatchEventHandler<T extends DisruptorEvent> ex
 	}
 	
 	protected String getPathWithinEvent(T event) {
-		return event.getRuleExpression();
+		return event.getRouteExpression();
 	}
 
 	protected boolean pathsMatch(String path, T event) {

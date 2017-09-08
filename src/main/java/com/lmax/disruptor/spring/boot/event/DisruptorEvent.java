@@ -7,8 +7,8 @@ public abstract class DisruptorEvent extends EventObject {
 
 	/** System time when the event happened */
 	private final long timestamp;
-	
-	private String ruleExpression;
+	/** Route Expression*/
+	private String routeExpression;
 	
 	/**
 	 * Create a new ConsumeEvent.
@@ -26,12 +26,12 @@ public abstract class DisruptorEvent extends EventObject {
 		return this.timestamp;
 	}
 
-	public String getRuleExpression() {
-		return ruleExpression;
+	public String getRouteExpression() {
+		return routeExpression;
 	}
 
-	public void setRuleExpression(String ruleExpression) {
-		this.ruleExpression = ruleExpression;
+	public void setRouteExpression(String routeExpression) {
+		this.routeExpression = routeExpression;
 	}
 	
 }
