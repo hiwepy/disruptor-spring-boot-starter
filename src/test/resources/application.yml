@@ -15,4 +15,11 @@ spring:
     ring-buffer-size: 1024
     ring-thread-numbers: 4
     multi-producer: true
+    event:
+      pre-definitions: /Topic-DC-Output/TagA-Output/** = inDbPreHandler
+        /Topic-DC-Output/TagB-Output/** = smsPreHandler
+        /** = allPreHandler
+      post-definitions: /Topic-DC-Output/TagA-Output/** = inDbPostHandler
+        /Topic-DC-Output/TagB-Output/** = smsPostHandler
+        /** = allPostHandler
         
