@@ -1,5 +1,7 @@
 package com.lmax.disruptor.spring.boot.handler;
 
+import org.springframework.core.Ordered;
+
 import com.lmax.disruptor.EventHandler;
 import com.lmax.disruptor.spring.boot.event.DisruptorEvent;
 import com.lmax.disruptor.spring.boot.handler.chain.HandlerChain;
@@ -9,11 +11,13 @@ import com.lmax.disruptor.spring.boot.handler.chain.ProxiedHandlerChain;
 /**
  * Disruptor 事件分发实现
  */
-public class DisruptorEventHandler extends AbstractRouteableEventHandler<DisruptorEvent> implements EventHandler<DisruptorEvent>{
+public class DisruptorEventHandler extends AbstractRouteableEventHandler<DisruptorEvent> implements EventHandler<DisruptorEvent>, Ordered {
 	
-
-	public DisruptorEventHandler(HandlerChainResolver<DisruptorEvent> filterChainResolver) {
+	private int order = 0;
+ 
+	public DisruptorEventHandler(HandlerChainResolver<DisruptorEvent> filterChainResolver,int order) {
 		super(filterChainResolver);
+		this.order = order;
 	}
 	
 	/*
@@ -27,6 +31,11 @@ public class DisruptorEventHandler extends AbstractRouteableEventHandler<Disrupt
 		//执行事件处理链
 		this.doHandler(event, originalChain);
 		
+	}
+
+	@Override
+	public int getOrder() {
+		return order;
 	}
 
 }

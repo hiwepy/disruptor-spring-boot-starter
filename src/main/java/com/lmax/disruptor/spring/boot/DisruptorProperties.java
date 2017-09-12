@@ -1,6 +1,11 @@
 package com.lmax.disruptor.spring.boot;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import com.lmax.disruptor.spring.boot.config.EventHandlerDefinition;
 
 @ConfigurationProperties(DisruptorProperties.PREFIX)
 public class DisruptorProperties {
@@ -14,7 +19,11 @@ public class DisruptorProperties {
 	private int ringBufferSize = 1024;
 	private int ringThreadNumbers = 4;
 	private boolean multiProducer = false;
-
+	 /**
+     * 
+     */
+    private List<EventHandlerDefinition> handlerDefinitions = new ArrayList<EventHandlerDefinition>();
+    
 	public boolean isEnabled() {
 		return enabled;
 	}
@@ -47,4 +56,12 @@ public class DisruptorProperties {
 		this.ringThreadNumbers = ringThreadNumbers;
 	}
 
+	public List<EventHandlerDefinition> getHandlerDefinitions() {
+		return handlerDefinitions;
+	}
+
+	public void setHandlerDefinitions(List<EventHandlerDefinition> handlerDefinitions) {
+		this.handlerDefinitions = handlerDefinitions;
+	}
+	
 }
