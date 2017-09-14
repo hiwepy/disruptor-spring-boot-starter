@@ -1,4 +1,4 @@
-package com.lmax.disruptor.spring.boot.handler.chain;
+package com.lmax.disruptor.spring.boot.event.handler.chain;
 
 import java.util.List;
 
@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.lmax.disruptor.spring.boot.event.DisruptorEvent;
-import com.lmax.disruptor.spring.boot.handler.DisruptorHandler;
+import com.lmax.disruptor.spring.boot.event.handler.DisruptorHandler;
 
 public class ProxiedHandlerChain implements HandlerChain<DisruptorEvent> {
 

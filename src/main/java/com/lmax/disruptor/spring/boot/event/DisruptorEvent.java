@@ -2,6 +2,14 @@ package com.lmax.disruptor.spring.boot.event;
 
 import java.util.EventObject;
 
+/**
+ * 
+ * @className	： DisruptorEvent
+ * @description	： 事件(Event) 就是通过 Disruptor 进行交换的数据类型。
+ * @author 		： <a href="https://github.com/vindell">vindell</a>
+ * @date		： 2017年4月20日 下午9:29:21
+ * @version 	V1.0
+ */
 @SuppressWarnings("serial")
 public abstract class DisruptorEvent extends EventObject {
 

@@ -1,4 +1,4 @@
-package com.lmax.disruptor.spring.boot.handler.chain.def;
+package com.lmax.disruptor.spring.boot.event.handler.chain.def;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -9,10 +9,10 @@ import java.util.ListIterator;
 import org.apache.commons.lang3.StringUtils;
 
 import com.lmax.disruptor.spring.boot.event.DisruptorEvent;
-import com.lmax.disruptor.spring.boot.handler.DisruptorHandler;
-import com.lmax.disruptor.spring.boot.handler.NamedHandlerList;
-import com.lmax.disruptor.spring.boot.handler.chain.HandlerChain;
-import com.lmax.disruptor.spring.boot.handler.chain.ProxiedHandlerChain;
+import com.lmax.disruptor.spring.boot.event.handler.DisruptorHandler;
+import com.lmax.disruptor.spring.boot.event.handler.NamedHandlerList;
+import com.lmax.disruptor.spring.boot.event.handler.chain.HandlerChain;
+import com.lmax.disruptor.spring.boot.event.handler.chain.ProxiedHandlerChain;
 
 public class DefaultNamedHandlerList implements NamedHandlerList<DisruptorEvent> {
 

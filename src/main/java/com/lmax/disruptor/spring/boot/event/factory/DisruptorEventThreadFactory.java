@@ -1,4 +1,4 @@
-package com.lmax.disruptor.spring.boot.factory;
+package com.lmax.disruptor.spring.boot.event.factory;
 
 import java.util.concurrent.ThreadFactory;
 

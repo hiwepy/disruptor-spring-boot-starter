@@ -1,4 +1,4 @@
-package com.lmax.disruptor.spring.boot.handler;
+package com.lmax.disruptor.spring.boot.event.handler;
 
 /**
  * 设置一个唯一的名称

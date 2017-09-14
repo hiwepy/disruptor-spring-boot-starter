@@ -1,7 +1,7 @@
-package com.lmax.disruptor.spring.boot.handler;
+package com.lmax.disruptor.spring.boot.event.handler;
 
 import com.lmax.disruptor.spring.boot.event.DisruptorEvent;
-import com.lmax.disruptor.spring.boot.handler.chain.HandlerChain;
+import com.lmax.disruptor.spring.boot.event.handler.chain.HandlerChain;
 
 public interface DisruptorHandler<T extends DisruptorEvent> {
 

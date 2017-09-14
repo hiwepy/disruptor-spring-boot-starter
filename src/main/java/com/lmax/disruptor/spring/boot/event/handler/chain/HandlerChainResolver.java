@@ -1,4 +1,4 @@
-package com.lmax.disruptor.spring.boot.handler.chain;
+package com.lmax.disruptor.spring.boot.event.handler.chain;
 
 import com.lmax.disruptor.spring.boot.event.DisruptorEvent;
 

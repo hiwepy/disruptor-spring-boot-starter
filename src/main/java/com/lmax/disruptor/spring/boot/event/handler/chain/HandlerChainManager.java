@@ -1,11 +1,11 @@
-package com.lmax.disruptor.spring.boot.handler.chain;
+package com.lmax.disruptor.spring.boot.event.handler.chain;
 
 import java.util.Map;
 import java.util.Set;
 
 import com.lmax.disruptor.spring.boot.event.DisruptorEvent;
-import com.lmax.disruptor.spring.boot.handler.DisruptorHandler;
-import com.lmax.disruptor.spring.boot.handler.NamedHandlerList;
+import com.lmax.disruptor.spring.boot.event.handler.DisruptorHandler;
+import com.lmax.disruptor.spring.boot.event.handler.NamedHandlerList;
 
 /**
  * HandlerChain管理器，负责创建和维护HandlerChain

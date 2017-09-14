@@ -1,4 +1,4 @@
-package com.lmax.disruptor.spring.boot.handler;
+package com.lmax.disruptor.spring.boot.event.handler;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,10 +1,10 @@
-package com.lmax.disruptor.spring.boot.handler;
+package com.lmax.disruptor.spring.boot.event.handler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.lmax.disruptor.spring.boot.event.DisruptorEvent;
-import com.lmax.disruptor.spring.boot.handler.chain.HandlerChain;
+import com.lmax.disruptor.spring.boot.event.handler.chain.HandlerChain;
 
 public class AbstractAdviceEventHandler<T extends DisruptorEvent> extends AbstractEnabledEventHandler<T> {
 

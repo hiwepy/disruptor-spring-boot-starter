@@ -15,6 +15,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -30,6 +31,7 @@ import org.springframework.util.ObjectUtils;
 
 import com.lmax.disruptor.BatchEventProcessor;
 import com.lmax.disruptor.EventFactory;
+import com.lmax.disruptor.EventTranslator;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.SequenceBarrier;
 import com.lmax.disruptor.WaitStrategy;
@@ -38,14 +40,17 @@ import com.lmax.disruptor.dsl.EventHandlerGroup;
 import com.lmax.disruptor.dsl.ProducerType;
 import com.lmax.disruptor.spring.boot.config.EventHandlerDefinition;
 import com.lmax.disruptor.spring.boot.config.Ini;
+import com.lmax.disruptor.spring.boot.context.DisruptorApplicationContext;
+import com.lmax.disruptor.spring.boot.context.DisruptorEventAwareProcessor;
 import com.lmax.disruptor.spring.boot.event.DisruptorEvent;
-import com.lmax.disruptor.spring.boot.factory.DisruptorEventThreadFactory;
-import com.lmax.disruptor.spring.boot.handler.DisruptorEventHandler;
-import com.lmax.disruptor.spring.boot.handler.DisruptorHandler;
-import com.lmax.disruptor.spring.boot.handler.Nameable;
-import com.lmax.disruptor.spring.boot.handler.chain.HandlerChainManager;
-import com.lmax.disruptor.spring.boot.handler.chain.def.DefaultHandlerChainManager;
-import com.lmax.disruptor.spring.boot.handler.chain.def.PathMatchingHandlerChainResolver;
+import com.lmax.disruptor.spring.boot.event.factory.DisruptorEventThreadFactory;
+import com.lmax.disruptor.spring.boot.event.handler.DisruptorEventHandler;
+import com.lmax.disruptor.spring.boot.event.handler.DisruptorHandler;
+import com.lmax.disruptor.spring.boot.event.handler.Nameable;
+import com.lmax.disruptor.spring.boot.event.handler.chain.HandlerChainManager;
+import com.lmax.disruptor.spring.boot.event.handler.chain.def.DefaultHandlerChainManager;
+import com.lmax.disruptor.spring.boot.event.handler.chain.def.PathMatchingHandlerChainResolver;
+import com.lmax.disruptor.spring.boot.event.translator.DisruptorEventTranslator;
 import com.lmax.disruptor.spring.boot.hooks.DisruptorShutdownHook;
 import com.lmax.disruptor.spring.boot.util.StringUtils;
 import com.lmax.disruptor.spring.boot.util.WaitStrategys;
@@ -281,9 +286,14 @@ public class DisruptorAutoConfiguration implements ApplicationContextAware {
 	@Bean
 	@ConditionalOnClass({ Disruptor.class })
 	@ConditionalOnProperty(prefix = DisruptorProperties.PREFIX, value = "enabled", havingValue = "true")
-	protected Disruptor<DisruptorEvent> disruptor(DisruptorProperties properties, WaitStrategy waitStrategy,
-			ThreadFactory threadFactory, EventFactory<DisruptorEvent> eventFactory,
-			@Autowired(required = false) @Qualifier("disruptorEventHandlers") List<DisruptorEventHandler> disruptorEventHandlers) {
+	protected Disruptor<DisruptorEvent> disruptor(
+			DisruptorProperties properties, 
+			WaitStrategy waitStrategy,
+			ThreadFactory threadFactory, 
+			EventFactory<DisruptorEvent> eventFactory,
+			@Autowired(required = false)
+			@Qualifier("disruptorEventHandlers") 
+			List<DisruptorEventHandler> disruptorEventHandlers) {
 
 		Disruptor<DisruptorEvent> disruptor = null;
 		if (properties.isMultiProducer()) {
@@ -325,7 +335,33 @@ public class DisruptorAutoConfiguration implements ApplicationContextAware {
 		return disruptor;
 
 	}
-
+	
+	@Bean
+	@ConditionalOnMissingBean
+	public EventTranslator<DisruptorEvent> eventTranslator() {
+		return new DisruptorEventTranslator();
+	}
+	
+	@Bean
+	@ConditionalOnBean({ Disruptor.class })
+	public DisruptorApplicationContext disruptorContext(
+			Disruptor<DisruptorEvent> disruptor,
+			EventTranslator<DisruptorEvent> eventTranslator) {
+		DisruptorApplicationContext disruptorContext = new DisruptorApplicationContext();
+		
+		disruptorContext.setApplicationContext(getApplicationContext());
+		disruptorContext.setDisruptor(disruptor);
+		disruptorContext.setEventTranslator(eventTranslator);
+		
+		return disruptorContext;
+	}
+	
+	@Bean
+	@ConditionalOnBean({ DisruptorApplicationContext.class })
+	public DisruptorEventAwareProcessor disruptorEventAwareProcessor(DisruptorApplicationContext disruptorContext) {
+		return new DisruptorEventAwareProcessor(disruptorContext);
+	}
+	
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
