@@ -22,8 +22,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import com.lmax.disruptor.EventTranslator;
+import com.lmax.disruptor.EventTranslatorOneArg;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.spring.boot.context.event.DisruptorEventPublisher;
+import com.lmax.disruptor.spring.boot.event.DisruptorBindEvent;
 import com.lmax.disruptor.spring.boot.event.DisruptorEvent;
 import com.lmax.disruptor.spring.boot.event.translator.DisruptorEventTranslator;
 
@@ -33,7 +35,7 @@ public class DisruptorApplicationContext implements ApplicationContextAware, Dis
 	
 	protected Disruptor<DisruptorEvent> disruptor = null;
 	
-	protected EventTranslator<DisruptorEvent> eventTranslator = null;
+	protected EventTranslatorOneArg<DisruptorEvent, Object> eventTranslator = null;
 	
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -46,7 +48,13 @@ public class DisruptorApplicationContext implements ApplicationContextAware, Dis
 	
 	@Override
 	public void publishEvent(DisruptorEvent event) {
-		disruptor.publishEvent(eventTranslator);
+		
+		if(event instanceof DisruptorBindEvent){
+			DisruptorBindEvent bindEvent = (DisruptorBindEvent)event;
+			disruptor.publishEvent(eventTranslator, bindEvent.getBind());
+		} else {
+			disruptor.publishEvent(eventTranslator, null);
+		}
 		//disruptor.getRingBuffer().tryPublishEvent(eventTranslator);
 	}
 	
@@ -67,11 +75,11 @@ public class DisruptorApplicationContext implements ApplicationContextAware, Dis
 		this.disruptor = disruptor;
 	}
 
-	public EventTranslator<DisruptorEvent> getEventTranslator() {
+	public EventTranslatorOneArg<DisruptorEvent, Object> getEventTranslator() {
 		return eventTranslator;
 	}
 
-	public void setEventTranslator(EventTranslator<DisruptorEvent> eventTranslator) {
+	public void setEventTranslator(EventTranslatorOneArg<DisruptorEvent, Object> eventTranslator) {
 		this.eventTranslator = eventTranslator;
 	}
 	

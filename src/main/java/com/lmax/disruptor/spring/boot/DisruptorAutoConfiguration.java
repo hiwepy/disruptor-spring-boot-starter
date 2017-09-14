@@ -32,6 +32,7 @@ import org.springframework.util.ObjectUtils;
 import com.lmax.disruptor.BatchEventProcessor;
 import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.EventTranslator;
+import com.lmax.disruptor.EventTranslatorOneArg;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.SequenceBarrier;
 import com.lmax.disruptor.WaitStrategy;
@@ -338,7 +339,7 @@ public class DisruptorAutoConfiguration implements ApplicationContextAware {
 	
 	@Bean
 	@ConditionalOnMissingBean
-	public EventTranslator<DisruptorEvent> eventTranslator() {
+	public EventTranslatorOneArg<DisruptorEvent, Object> eventTranslator() {
 		return new DisruptorEventTranslator();
 	}
 	
@@ -346,7 +347,7 @@ public class DisruptorAutoConfiguration implements ApplicationContextAware {
 	@ConditionalOnBean({ Disruptor.class })
 	public DisruptorApplicationContext disruptorContext(
 			Disruptor<DisruptorEvent> disruptor,
-			EventTranslator<DisruptorEvent> eventTranslator) {
+			EventTranslatorOneArg<DisruptorEvent, Object> eventTranslator) {
 		DisruptorApplicationContext disruptorContext = new DisruptorApplicationContext();
 		
 		disruptorContext.setApplicationContext(getApplicationContext());
