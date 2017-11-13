@@ -11,11 +11,11 @@ import com.lmax.disruptor.spring.boot.event.handler.chain.ProxiedHandlerChain;
 /**
  * Disruptor 事件分发实现
  */
-public class DisruptorEventHandler extends AbstractRouteableEventHandler<DisruptorEvent> implements EventHandler<DisruptorEvent>, Ordered {
+public class DisruptorEventDispatcher extends AbstractRouteableEventHandler<DisruptorEvent> implements EventHandler<DisruptorEvent>, Ordered {
 	
 	private int order = 0;
  
-	public DisruptorEventHandler(HandlerChainResolver<DisruptorEvent> filterChainResolver,int order) {
+	public DisruptorEventDispatcher(HandlerChainResolver<DisruptorEvent> filterChainResolver,int order) {
 		super(filterChainResolver);
 		this.order = order;
 	}
