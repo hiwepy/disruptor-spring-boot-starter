@@ -1,29 +1,38 @@
-# Compiled class file
-*.class
-
-# Log file
-*.log
-
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
+*#
+*.iml
+*.ipr
+*.iws
 *.jar
-*.war
-*.ear
-*.zip
-*.tar.gz
-*.rar
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-/target/
-.project
+*.sw?
+*~
+.#*
+.*.md.html
+.DS_Store
 .classpath
 .factorypath
-/.settings/
+.gradle
+.idea
+.metadata
+.project
+.recommenders
+.settings
 .springBeans
-/.mvn/
+/build
+/code
+MANIFEST.MF
+_site/
+activemq-data
+bin
+build
+build.log
+dependency-reduced-pom.xml
+dump.rdb
+interpolated*.xml
+lib/
+manifest.yml
+overridedb.*
+settings.xml
+target
+transaction-logs
+.flattened-pom.xml
+secrets.yml
