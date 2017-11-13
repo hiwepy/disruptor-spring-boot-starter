@@ -1,6 +1,6 @@
-# spring-boot-starter-rocketmq
+# spring-boot-starter-disruptor
 
-starter for rocketmq
+starter for disruptor
 
 ###基于 Disruptor 异步并发框架 实现的 异步事件推送、处理封装。
 
