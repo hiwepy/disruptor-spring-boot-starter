@@ -303,4 +303,6 @@
 	</build>
 
 
+	<groupId>com.github.vindell</groupId>
+	<version>1.5.8-SNAPSHOT</version>
 </project>
