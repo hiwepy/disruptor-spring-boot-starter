@@ -17,12 +17,12 @@ spring:
     multi-producer: true
     handler-definitions:
     - order : 1 
-      definitions: /Topic-DC-Output/TagA-Output/** = inDbPreHandler
-        /Topic-DC-Output/TagB-Output/** = smsPreHandler
+      definitions: /Event-DC-Output/TagA-Output/** = inDbPreHandler
+        /Event-DC-Output/TagB-Output/** = smsPreHandler
         /** = allPreHandler
     - order: 2
-      definitions: /Topic-DC-Output/TagA-Output/** = inDbPostHandler
-        /Topic-DC-Output/TagB-Output/** = smsPostHandler
+      definitions: /Event-DC-Output/TagA-Output/** = inDbPostHandler
+        /Event-DC-Output/TagB-Output/** = smsPostHandler
         /** = allPostHandler
      
         

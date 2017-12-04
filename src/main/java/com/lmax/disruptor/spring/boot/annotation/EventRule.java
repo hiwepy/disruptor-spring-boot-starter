@@ -11,10 +11,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented	
 @Inherited		
-public @interface DisruptorEventHandler {
+public @interface EventRule {
 	
-	String ruleExpress() default "*";
-	
-	String handler();
+	/**
+	 * Ant风格的事件分发规则表达式,格式为：/event/tags/keys，如：/Event-DC-Output/TagA-Output/**
+	 */
+	String value() default "*";
 	
 }

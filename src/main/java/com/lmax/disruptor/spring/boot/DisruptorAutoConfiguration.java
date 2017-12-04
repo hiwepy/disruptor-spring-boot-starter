@@ -12,6 +12,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -39,7 +41,7 @@ import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.EventHandlerGroup;
 import com.lmax.disruptor.dsl.ProducerType;
-import com.lmax.disruptor.spring.boot.annotation.DisruptorEventHandler;
+import com.lmax.disruptor.spring.boot.annotation.EventRule;
 import com.lmax.disruptor.spring.boot.config.EventHandlerDefinition;
 import com.lmax.disruptor.spring.boot.config.Ini;
 import com.lmax.disruptor.spring.boot.context.DisruptorApplicationContext;
@@ -65,6 +67,7 @@ import com.lmax.disruptor.spring.boot.util.WaitStrategys;
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class DisruptorAutoConfiguration implements ApplicationContextAware {
 
+	private static final Logger LOG = LoggerFactory.getLogger(DisruptorAutoConfiguration.class);
 	private ApplicationContext applicationContext;
 	/**
 	 * 处理器链定义
@@ -167,9 +170,12 @@ public class DisruptorAutoConfiguration implements ApplicationContextAware {
 					continue;
 				}
 				
-				DisruptorEventHandler annotationType = getApplicationContext().findAnnotationOnBean(entry.getKey(), DisruptorEventHandler.class);
-				if(annotationType != null) {
-					handlerChainDefinitionMap.put(annotationType.ruleExpress(), annotationType.handler());
+				EventRule annotationType = getApplicationContext().findAnnotationOnBean(entry.getKey(), EventRule.class);
+				if(annotationType == null) {
+					// 注解为空，则打印错误信息
+					LOG.error("Not Found AnnotationType {0} on Bean {1} Whith Name {2}", EventRule.class, entry.getValue().getClass(), entry.getKey());
+				} else {
+					handlerChainDefinitionMap.put(annotationType.value(), entry.getKey());
 				}
 				
 				disruptorPreHandlers.put(entry.getKey(), entry.getValue());
