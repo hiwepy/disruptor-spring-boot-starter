@@ -17,44 +17,20 @@ package com.lmax.disruptor.spring.boot.context;
 
 
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import com.lmax.disruptor.EventTranslatorOneArg;
-import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.spring.boot.context.event.DisruptorEventPublisher;
-import com.lmax.disruptor.spring.boot.event.DisruptorBindEvent;
+import com.lmax.disruptor.spring.boot.event.DisruptorApplicationEvent;
 import com.lmax.disruptor.spring.boot.event.DisruptorEvent;
-import com.lmax.disruptor.spring.boot.event.translator.DisruptorEventTranslator;
 
-public class DisruptorApplicationContext implements ApplicationContextAware, DisruptorEventPublisher, InitializingBean {
+public class DisruptorApplicationContext implements ApplicationContextAware, DisruptorEventPublisher {
 
 	protected ApplicationContext applicationContext;
 	
-	protected Disruptor<DisruptorEvent> disruptor = null;
-	
-	protected EventTranslatorOneArg<DisruptorEvent, Object> eventTranslator = null;
-	
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		
-		if(eventTranslator == null){
-			eventTranslator = new DisruptorEventTranslator();
-		}
-		
-	}
-	
 	@Override
 	public void publishEvent(DisruptorEvent event) {
-		
-		if(event instanceof DisruptorBindEvent){
-			DisruptorBindEvent bindEvent = (DisruptorBindEvent)event;
-			disruptor.publishEvent(eventTranslator, bindEvent.getBind());
-		} else {
-			disruptor.publishEvent(eventTranslator, null);
-		}
-		//disruptor.getRingBuffer().tryPublishEvent(eventTranslator);
+		applicationContext.publishEvent(new DisruptorApplicationEvent(event));
 	}
 	
 	@Override
@@ -64,22 +40,6 @@ public class DisruptorApplicationContext implements ApplicationContextAware, Dis
 
 	public ApplicationContext getApplicationContext() {
 		return applicationContext;
-	}
-
-	public Disruptor<DisruptorEvent> getDisruptor() {
-		return disruptor;
-	}
-
-	public void setDisruptor(Disruptor<DisruptorEvent> disruptor) {
-		this.disruptor = disruptor;
-	}
-
-	public EventTranslatorOneArg<DisruptorEvent, Object> getEventTranslator() {
-		return eventTranslator;
-	}
-
-	public void setEventTranslator(EventTranslatorOneArg<DisruptorEvent, Object> eventTranslator) {
-		this.eventTranslator = eventTranslator;
 	}
 	
 }

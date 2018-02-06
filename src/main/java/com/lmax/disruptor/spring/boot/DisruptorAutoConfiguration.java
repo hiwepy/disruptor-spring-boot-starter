@@ -8,8 +8,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 import org.slf4j.Logger;
@@ -17,26 +15,21 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.AutoConfigureOrder;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.OrderComparator;
-import org.springframework.core.Ordered;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
-import com.lmax.disruptor.BatchEventProcessor;
 import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.EventTranslatorOneArg;
-import com.lmax.disruptor.RingBuffer;
-import com.lmax.disruptor.SequenceBarrier;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.EventHandlerGroup;
@@ -44,9 +37,11 @@ import com.lmax.disruptor.dsl.ProducerType;
 import com.lmax.disruptor.spring.boot.annotation.EventRule;
 import com.lmax.disruptor.spring.boot.config.EventHandlerDefinition;
 import com.lmax.disruptor.spring.boot.config.Ini;
-import com.lmax.disruptor.spring.boot.context.DisruptorApplicationContext;
 import com.lmax.disruptor.spring.boot.context.DisruptorEventAwareProcessor;
+import com.lmax.disruptor.spring.boot.event.DisruptorApplicationEvent;
+import com.lmax.disruptor.spring.boot.event.DisruptorBindEvent;
 import com.lmax.disruptor.spring.boot.event.DisruptorEvent;
+import com.lmax.disruptor.spring.boot.event.factory.DisruptorBindEventFactory;
 import com.lmax.disruptor.spring.boot.event.factory.DisruptorEventThreadFactory;
 import com.lmax.disruptor.spring.boot.event.handler.DisruptorEventDispatcher;
 import com.lmax.disruptor.spring.boot.event.handler.DisruptorHandler;
@@ -63,7 +58,6 @@ import com.lmax.disruptor.spring.boot.util.WaitStrategys;
 @ConditionalOnClass({ Disruptor.class })
 @ConditionalOnProperty(prefix = DisruptorProperties.PREFIX, value = "enabled", havingValue = "true")
 @EnableConfigurationProperties({ DisruptorProperties.class })
-@AutoConfigureOrder(Ordered.LOWEST_PRECEDENCE - 8)
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class DisruptorAutoConfiguration implements ApplicationContextAware {
 
@@ -90,68 +84,12 @@ public class DisruptorAutoConfiguration implements ApplicationContextAware {
 		return new DisruptorEventThreadFactory();
 	}
 
-	/**
-	 * http://blog.csdn.net/a314368439/article/details/72642653?utm_source=itdadao&utm_medium=referral
-	 * <p>
-	 * 创建RingBuffer
-	 * </p>
-	 * <p>
-	 * 1 eventFactory 为
-	 * <p>
-	 * 2 ringBufferSize为RingBuffer缓冲区大小，最好是2的指数倍
-	 * </p>
-	 * 
-	 * @param eventFactory
-	 *            工厂类对象，用于创建一个个的LongEvent，
-	 *            LongEvent是实际的消费数据，初始化启动Disruptor的时候，Disruptor会调用该工厂方法创建一个个的消费数据实例存放到RingBuffer缓冲区里面去，创建的对象个数为ringBufferSize指定的
-	 * @param ringBufferSize
-	 *            RingBuffer缓冲区大小
-	 * @param executor
-	 *            线程池，Disruptor内部的对数据进行接收处理时调用
-	 * @param producerType
-	 *            用来指定数据生成者有一个还是多个，有两个可选值ProducerType.SINGLE和ProducerType.MULTI
-	 * @param waitStrategy
-	 *            一种策略，用来均衡数据生产者和消费者之间的处理效率，默认提供了3个实现类
-	 */
 	@Bean
-	@ConditionalOnClass({ RingBuffer.class })
-	protected RingBuffer<DisruptorEvent> ringBuffer(DisruptorProperties properties, WaitStrategy waitStrategy,
-			EventFactory<DisruptorEvent> eventFactory,
-			@Autowired(required = false) DisruptorEventDispatcher preEventHandler,
-			@Autowired(required = false) DisruptorEventDispatcher postEventHandler) {
-
-		// 创建线程池
-		ExecutorService executor = Executors.newFixedThreadPool(properties.getRingThreadNumbers());
-		/*
-		 * 第一个参数叫EventFactory，从名字上理解就是“事件工厂”，其实它的职责就是产生数据填充RingBuffer的区块。
-		 * 第二个参数是RingBuffer的大小，它必须是2的指数倍 目的是为了将求模运算转为&运算提高效率
-		 * 第三个参数是RingBuffer的生产都在没有可用区块的时候(可能是消费者（或者说是事件处理器） 太慢了)的等待策略
-		 */
-		RingBuffer<DisruptorEvent> ringBuffer = null;
-		if (properties.isMultiProducer()) {
-			// RingBuffer.createMultiProducer创建一个多生产者的RingBuffer
-			ringBuffer = RingBuffer.createMultiProducer(eventFactory, properties.getRingBufferSize(), waitStrategy);
-		} else {
-			// RingBuffer.createSingleProducer创建一个单生产者的RingBuffer
-			ringBuffer = RingBuffer.createSingleProducer(eventFactory, properties.getRingBufferSize(), waitStrategy);
-		}
-
-		// 单个处理器
-		if (null != preEventHandler) {
-			// 创建SequenceBarrier
-			SequenceBarrier sequenceBarrier = ringBuffer.newBarrier();
-			// 创建消息处理器
-			BatchEventProcessor<DisruptorEvent> transProcessor = new BatchEventProcessor<DisruptorEvent>(ringBuffer,
-					sequenceBarrier, preEventHandler);
-			// 这一部的目的是让RingBuffer根据消费者的状态 如果只有一个消费者的情况可以省略
-			ringBuffer.addGatingSequences(transProcessor.getSequence());
-			// 把消息处理器提交到线程池
-			executor.submit(transProcessor);
-		}
-
-		return ringBuffer;
+	@ConditionalOnMissingBean
+	public EventFactory<DisruptorEvent> eventFactory() {
+		return new DisruptorBindEventFactory();
 	}
-
+	
 	/**
 	 * Handler实现集合
 	 */
@@ -302,7 +240,7 @@ public class DisruptorAutoConfiguration implements ApplicationContextAware {
 	@Bean
 	@ConditionalOnClass({ Disruptor.class })
 	@ConditionalOnProperty(prefix = DisruptorProperties.PREFIX, value = "enabled", havingValue = "true")
-	protected Disruptor<DisruptorEvent> disruptor(
+	public Disruptor<DisruptorEvent> disruptor(
 			DisruptorProperties properties, 
 			WaitStrategy waitStrategy,
 			ThreadFactory threadFactory, 
@@ -359,23 +297,27 @@ public class DisruptorAutoConfiguration implements ApplicationContextAware {
 	}
 	
 	@Bean
-	@ConditionalOnBean({ Disruptor.class })
-	public DisruptorApplicationContext disruptorContext(
-			Disruptor<DisruptorEvent> disruptor,
+	public ApplicationListener<DisruptorApplicationEvent> disruptorEventListener(Disruptor<DisruptorEvent> disruptor,
 			EventTranslatorOneArg<DisruptorEvent, Object> eventTranslator) {
-		DisruptorApplicationContext disruptorContext = new DisruptorApplicationContext();
-		
-		disruptorContext.setApplicationContext(getApplicationContext());
-		disruptorContext.setDisruptor(disruptor);
-		disruptorContext.setEventTranslator(eventTranslator);
-		
-		return disruptorContext;
+		return new ApplicationListener<DisruptorApplicationEvent>() {
+
+			@Override
+			public void onApplicationEvent(DisruptorApplicationEvent appEvent) {
+				
+				DisruptorEvent event = (DisruptorEvent) appEvent.getSource();
+				if(event instanceof DisruptorBindEvent){
+					DisruptorBindEvent bindEvent = (DisruptorBindEvent) event;
+					disruptor.publishEvent(eventTranslator, bindEvent.getBind());
+				} else {
+				}
+			}
+			
+		};
 	}
 	
 	@Bean
-	@ConditionalOnBean({ DisruptorApplicationContext.class })
-	public DisruptorEventAwareProcessor disruptorEventAwareProcessor(DisruptorApplicationContext disruptorContext) {
-		return new DisruptorEventAwareProcessor(disruptorContext);
+	public DisruptorEventAwareProcessor disruptorEventAwareProcessor() {
+		return new DisruptorEventAwareProcessor();
 	}
 	
 	@Override

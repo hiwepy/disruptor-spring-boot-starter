@@ -21,15 +21,19 @@ import java.security.PrivilegedAction;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.Aware;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.support.SecurityContextProvider;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 import com.lmax.disruptor.spring.boot.context.event.DisruptorEventPublisherAware;
 
-public class DisruptorEventAwareProcessor implements BeanPostProcessor {
+public class DisruptorEventAwareProcessor implements ApplicationContextAware ,BeanPostProcessor, InitializingBean {
 
-	private final DisruptorApplicationContext disruptorContext;
+	private DisruptorApplicationContext disruptorContext;
+	private ApplicationContext applicationContext;
 	
 	/** Security context used when running with a SecurityManager */
 	private SecurityContextProvider securityContextProvider;
@@ -63,8 +67,7 @@ public class DisruptorEventAwareProcessor implements BeanPostProcessor {
 	/**
 	 * Create a new ApplicationContextAwareProcessor for the given context.
 	 */
-	public DisruptorEventAwareProcessor(DisruptorApplicationContext disruptorContext) {
-		this.disruptorContext = disruptorContext;
+	public DisruptorEventAwareProcessor() {
 	}
 	
 	@Override
@@ -103,5 +106,17 @@ public class DisruptorEventAwareProcessor implements BeanPostProcessor {
 	public Object postProcessAfterInitialization(Object bean, String beanName) {
 		return bean;
 	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		disruptorContext = new DisruptorApplicationContext();
+		disruptorContext.setApplicationContext(applicationContext);
+	}
+
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		this.applicationContext = applicationContext;
+	}
+
 
 }

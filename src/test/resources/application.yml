@@ -12,6 +12,7 @@ server:
 spring:  
   disruptor: 
     enabled: true
+    ring-buffer: false
     ring-buffer-size: 1024
     ring-thread-numbers: 4
     multi-producer: true
