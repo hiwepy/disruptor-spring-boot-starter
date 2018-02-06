@@ -18,17 +18,20 @@ package com.lmax.disruptor.spring.boot.event.translator;
 import com.lmax.disruptor.EventTranslatorOneArg;
 import com.lmax.disruptor.spring.boot.event.DisruptorBindEvent;
 import com.lmax.disruptor.spring.boot.event.DisruptorEvent;
+import com.lmax.disruptor.spring.boot.util.StringUtils;
 
-public class DisruptorEventTranslator implements EventTranslatorOneArg<DisruptorEvent, Object> {
+public class DisruptorEventOneArgTranslator implements EventTranslatorOneArg<DisruptorEvent, DisruptorEvent> {
 
 	@Override
-	public void translateTo(DisruptorEvent event, long sequence, Object bind) {
-		
+	public void translateTo(DisruptorEvent event, long sequence, DisruptorEvent bind) {
+		event.setSource(bind.getSource());
+		event.setEvent(bind.getEvent());
+		event.setTag(bind.getTag());
+		event.setKey(StringUtils.hasText(bind.getKey()) ? bind.getKey() : String.valueOf(sequence));
 		if(event instanceof DisruptorBindEvent){
 			DisruptorBindEvent bindEvent = (DisruptorBindEvent)event;
 			bindEvent.bind(bind);
 		}
-		
 	}
 	
 }

@@ -23,6 +23,10 @@ public class DisruptorBindEvent extends DisruptorEvent {
 	 */
 	protected Object bind;
 
+	public DisruptorBindEvent() {
+		super(null);
+	}
+	
 	public DisruptorBindEvent(Object source) {
 		super(source);
 	}

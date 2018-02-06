@@ -19,7 +19,7 @@ import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.spring.boot.event.DisruptorBindEvent;
 import com.lmax.disruptor.spring.boot.event.DisruptorEvent;
 
-public class DisruptorBindEventFactory  implements EventFactory<DisruptorEvent> {
+public class DisruptorBindEventFactory implements EventFactory<DisruptorEvent> {
 
 	@Override
 	public DisruptorEvent newInstance() {
