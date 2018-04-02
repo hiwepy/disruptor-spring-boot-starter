@@ -937,7 +937,7 @@ public abstract class StringUtils extends org.apache.commons.lang3.StringUtils {
 	/**
 	 * 
 	 * @description	：获得以 ",; \t\n"分割的字符数组
-	 * @author 		： wandalong
+	 * @author 		： vindell
 	 * @date 		：Dec 17, 2015 9:07:47 PM
 	 * @param str
 	 * @return
@@ -1430,7 +1430,7 @@ public abstract class StringUtils extends org.apache.commons.lang3.StringUtils {
 	/**
 	 * 
 	 * @description: 圆括号()包裹
-	 * @author : wandalong
+	 * @author : vindell
 	 * @date : 2014-4-29
 	 * @time : 下午03:11:57
 	 * @param source
@@ -1443,7 +1443,7 @@ public abstract class StringUtils extends org.apache.commons.lang3.StringUtils {
 	/**
 	 * 
 	 * @description: 方括号[]包裹
-	 * @author : wandalong
+	 * @author : vindell
 	 * @date : 2014-4-29
 	 * @time : 下午03:11:57
 	 * @param source
@@ -1472,7 +1472,7 @@ public abstract class StringUtils extends org.apache.commons.lang3.StringUtils {
 	/**
 	 * 
 	 * @description: 将String集合元素用'包围，并拼接
-	 * @author : wandalong
+	 * @author : vindell
 	 * @date : 2014-4-29
 	 * @time : 下午02:13:09
 	 * @param list
@@ -1512,7 +1512,7 @@ public abstract class StringUtils extends org.apache.commons.lang3.StringUtils {
 	 * @description： 把一个字符的非Alpha字符都去掉,String string = "1\r\n1\r\n";-->结果："11";
 	 * @return: String
 	 * @method: trimToAlphaString
-	 * @author: wandalong
+	 * @author: vindell
 	 * @version: 2010-12-15 下午09:06:02
 	 */
 	public static String trimToAlphaString(String string) {
@@ -1531,7 +1531,7 @@ public abstract class StringUtils extends org.apache.commons.lang3.StringUtils {
 	 * 
 	 * @return: String[]
 	 * @method: trimToAlphaStrings
-	 * @author: wandalong
+	 * @author: vindell
 	 * @version: 2010-12-15 下午09:06:31
 	 */
 	public static String[] trimToAlphaStrings(String string) {
