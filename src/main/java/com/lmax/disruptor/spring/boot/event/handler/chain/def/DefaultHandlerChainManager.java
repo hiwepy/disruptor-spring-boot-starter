@@ -84,6 +84,8 @@ public class DefaultHandlerChainManager implements HandlerChainManager<Disruptor
 
     /**
      * Splits the comma-delimited handler chain definition line into individual handler definition tokens.
+     * @param chainDefinition chain definition line 
+     * @return array of chain definition
      */
     protected String[] splitChainDefinition(String chainDefinition) {
     	String trimToNull = StringUtils.trimToNull(chainDefinition);

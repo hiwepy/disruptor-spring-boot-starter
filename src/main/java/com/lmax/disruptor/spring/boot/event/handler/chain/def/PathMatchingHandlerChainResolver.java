@@ -2,13 +2,13 @@ package com.lmax.disruptor.spring.boot.event.handler.chain.def;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.util.PathMatcher;
 
 import com.lmax.disruptor.spring.boot.event.DisruptorEvent;
 import com.lmax.disruptor.spring.boot.event.handler.chain.HandlerChain;
 import com.lmax.disruptor.spring.boot.event.handler.chain.HandlerChainManager;
 import com.lmax.disruptor.spring.boot.event.handler.chain.HandlerChainResolver;
-import com.lmax.disruptor.spring.boot.util.AntPathMatcher;
-import com.lmax.disruptor.spring.boot.util.PathMatcher;
 
 public class PathMatchingHandlerChainResolver implements HandlerChainResolver<DisruptorEvent> {
 

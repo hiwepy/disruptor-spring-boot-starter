@@ -13,7 +13,7 @@
 	<groupId>com.github.vindell</groupId>
 	<artifactId>spring-boot-starter-disruptor</artifactId>
 	<description>Spring Boot Starter For Disruptor</description>
-	<version>1.0.1.RELEASE</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<name>${project.groupId}:${project.artifactId}</name>
 	<url>https://github.com/vindell/${project.artifactId}</url>
 	<packaging>jar</packaging>

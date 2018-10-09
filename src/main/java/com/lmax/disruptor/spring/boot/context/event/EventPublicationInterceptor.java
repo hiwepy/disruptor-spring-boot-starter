@@ -37,6 +37,7 @@ public class EventPublicationInterceptor
 	 * <p>The event class <b>must</b> have a constructor with a single
 	 * {@code Object} argument for the event source. The interceptor
 	 * will pass in the invoked object.
+	 * @param applicationEventClass the application event class
 	 * @throws IllegalArgumentException if the supplied {@code Class} is
 	 * {@code null} or if it is not an {@code ApplicationEvent} subclass or
 	 * if it does not expose a constructor that takes a single {@code Object} argument

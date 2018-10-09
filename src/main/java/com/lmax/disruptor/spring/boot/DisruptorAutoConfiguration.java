@@ -73,6 +73,7 @@ public class DisruptorAutoConfiguration implements ApplicationContextAware {
 	/**
 	 * 决定一个消费者将如何等待生产者将Event置入Disruptor的策略。用来权衡当生产者无法将新的事件放进RingBuffer时的处理策略。
 	 * （例如：当生产者太快，消费者太慢，会导致生成者获取不到新的事件槽来插入新事件，则会根据该策略进行处理，默认会堵塞）
+	 * @return {@link WaitStrategy} instance
 	 */
 	@Bean
 	@ConditionalOnMissingBean
@@ -92,7 +93,7 @@ public class DisruptorAutoConfiguration implements ApplicationContextAware {
 		return new DisruptorBindEventFactory();
 	}
 	
-	/**
+	/*
 	 * Handler实现集合
 	 */
 	@Bean("disruptorHandlers")
@@ -127,7 +128,7 @@ public class DisruptorAutoConfiguration implements ApplicationContextAware {
 		return disruptorPreHandlers;
 	}
 
-	/**
+	/*
 	 * 处理器链集合
 	 */
 	@Bean("disruptorEventHandlers")
@@ -163,12 +164,8 @@ public class DisruptorAutoConfiguration implements ApplicationContextAware {
 		return disruptorEventHandlers;
 	}
 
-	/**
-	 * 
-	 * @description ： 构造DisruptorEventHandler
-	 * @param handlerDefinition
-	 * @param eventHandlers
-	 * @return
+	/*
+	 * 构造DisruptorEventHandler
 	 */
 	protected DisruptorEventDispatcher createDisruptorEventHandler(EventHandlerDefinition handlerDefinition,
 			Map<String, DisruptorHandler<DisruptorEvent>> eventHandlers) {
@@ -224,7 +221,7 @@ public class DisruptorAutoConfiguration implements ApplicationContextAware {
 	}
 
 	/**
-	 * http://blog.csdn.net/a314368439/article/details/72642653?utm_source=itdadao&utm_medium=referral
+	 * 
 	 * <p>
 	 * 创建Disruptor
 	 * </p>
@@ -234,17 +231,12 @@ public class DisruptorAutoConfiguration implements ApplicationContextAware {
 	 * 2 ringBufferSize为RingBuffer缓冲区大小，最好是2的指数倍
 	 * </p>
 	 * 
-	 * @param eventFactory
-	 *            工厂类对象，用于创建一个个的LongEvent，
-	 *            LongEvent是实际的消费数据，初始化启动Disruptor的时候，Disruptor会调用该工厂方法创建一个个的消费数据实例存放到RingBuffer缓冲区里面去，创建的对象个数为ringBufferSize指定的
-	 * @param ringBufferSize
-	 *            RingBuffer缓冲区大小
-	 * @param executor
-	 *            线程池，Disruptor内部的对数据进行接收处理时调用
-	 * @param producerType
-	 *            用来指定数据生成者有一个还是多个，有两个可选值ProducerType.SINGLE和ProducerType.MULTI
-	 * @param waitStrategy
-	 *            一种策略，用来均衡数据生产者和消费者之间的处理效率，默认提供了3个实现类
+	 * @param properties	: 配置参数
+	 * @param waitStrategy 	: 一种策略，用来均衡数据生产者和消费者之间的处理效率，默认提供了3个实现类
+	 * @param threadFactory	: 线程工厂
+	 * @param eventFactory	: 工厂类对象，用于创建一个个的LongEvent， LongEvent是实际的消费数据，初始化启动Disruptor的时候，Disruptor会调用该工厂方法创建一个个的消费数据实例存放到RingBuffer缓冲区里面去，创建的对象个数为ringBufferSize指定的
+	 * @param disruptorEventHandlers	: 事件分发器
+	 * @return {@link Disruptor} instance
 	 */
 	@Bean
 	@ConditionalOnClass({ Disruptor.class })
@@ -256,7 +248,9 @@ public class DisruptorAutoConfiguration implements ApplicationContextAware {
 			EventFactory<DisruptorEvent> eventFactory,
 			@Qualifier("disruptorEventHandlers") 
 			List<DisruptorEventDispatcher> disruptorEventHandlers) {
-
+		
+		// http://blog.csdn.net/a314368439/article/details/72642653?utm_source=itdadao&utm_medium=referral
+			
 		Disruptor<DisruptorEvent> disruptor = null;
 		if (properties.isMultiProducer()) {
 			disruptor = new Disruptor<DisruptorEvent>(eventFactory, properties.getRingBufferSize(), threadFactory,

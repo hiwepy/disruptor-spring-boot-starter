@@ -42,6 +42,7 @@ public class DisruptorEventAwareProcessor implements ApplicationContextAware ,Be
 	 * Set the security context provider for this bean factory. If a security manager
 	 * is set, interaction with the user code will be executed using the privileged
 	 * of the provided security context.
+	 * @param securityProvider {@link SecurityContextProvider} instance
 	 */
 	public void setSecurityContextProvider(SecurityContextProvider securityProvider) {
 		this.securityContextProvider = securityProvider;
@@ -50,6 +51,7 @@ public class DisruptorEventAwareProcessor implements ApplicationContextAware ,Be
 	/**
 	 * Delegate the creation of the access control context to the
 	 * {@link #setSecurityContextProvider SecurityContextProvider}.
+	 * @return {@link AccessControlContext} instance
 	 */
 	public AccessControlContext getAccessControlContext() {
 		if(this.securityContextProvider != null){
