@@ -13,7 +13,7 @@
 	<groupId>com.github.vindell</groupId>
 	<artifactId>spring-boot-starter-disruptor</artifactId>
 	<description>Spring Boot Starter For Disruptor</description>
-	<version>1.0.2.RELEASE</version>
+	<version>1.0.3-SNAPSHOT</version>
 	<name>${project.groupId}:${project.artifactId}</name>
 	<url>https://github.com/vindell/${project.artifactId}</url>
 	<packaging>jar</packaging>
@@ -365,7 +365,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<commons-collections4.version>4.1</commons-collections4.version>
-		<disruptor.version>3.4.1</disruptor.version>
+		<disruptor.version>3.4.2</disruptor.version>
 		<maven.version>3.0</maven.version>
        	<maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
