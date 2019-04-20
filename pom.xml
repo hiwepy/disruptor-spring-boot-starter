@@ -56,6 +56,22 @@
 		  </repository>
 	</distributionManagement>
 	
+	<!-- 配置部署的远程仓库:让Maven知道当我要发布release版本或者snapshot版本是需要发布到哪个地址 -->
+	<distributionManagement>
+        <repository>
+            <id>nexus-releases</id>
+            <name>Nexus Release Repository</name>
+            <url>http://192.168.3.15:8081/nexus/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>nexus-snapshots</id>
+            <name>Nexus Snapshot Repository</name>
+            <url>http://192.168.3.15:8081/nexus/content/repositories/snapshots/</url>
+            <!-- 表示是否为Snapshot版本分配一个包含时间戳的构建号 -->
+			<uniqueVersion>true</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
+    
 	<build>
 		<pluginManagement>
 			<plugins>
