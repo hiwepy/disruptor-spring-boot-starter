@@ -1,6 +1,6 @@
-# spring-boot-starter-disruptor
+# disruptor-spring-boot-starter
 
-starter for disruptor
+Spring Boot Starter For Disruptor
 
 ### 基于 Disruptor 的 Spring Boot Starter 实现, 异步事件推送、处理封装
 
@@ -25,7 +25,7 @@ starter for disruptor
 ``` xml
 <dependency>
 	<groupId>${project.groupId}</groupId>
-	<artifactId>spring-boot-starter-disruptor</artifactId>
+	<artifactId>disruptor-spring-boot-starter</artifactId>
 	<version>${project.version}</version>
 </dependency>
 ```
