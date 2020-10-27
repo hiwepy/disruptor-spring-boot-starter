@@ -33,3 +33,12 @@ Spring Boot Starter For Disruptor
 ### Sample
 
 [https://github.com/vindell/spring-boot-starter-samples/tree/master/spring-boot-sample-disruptor](https://github.com/vindell/spring-boot-starter-samples/tree/master/spring-boot-sample-disruptor "spring-boot-sample-disruptor")
+
+
+## Jeebiz 技术社区
+
+Jeebiz 技术社区 **微信公共号**、**小程序**，欢迎关注反馈意见和一起交流，关注公众号回复「Jeebiz」拉你入群。
+
+|公共号|小程序|
+|---|---|
+| ![](https://raw.githubusercontent.com/hiwepy/static/main/images/qrcode_for_gh_1d965ea2dfd1_344.jpg)| ![](https://raw.githubusercontent.com/hiwepy/static/main/images/gh_09d7d00da63e_344.jpg)|
