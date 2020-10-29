@@ -230,7 +230,7 @@
 					<configuration>
 						<serverId>ossrh</serverId>
 						<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-						<autoReleaseAfterClose>false</autoReleaseAfterClose>
+						<autoReleaseAfterClose>true</autoReleaseAfterClose>
 						<!-- <sslAllowAll>true</sslAllowAll> -->
 						<stagingProgressPauseDurationSeconds>60</stagingProgressPauseDurationSeconds>
 						<stagingProgressTimeoutMinutes>20</stagingProgressTimeoutMinutes>
