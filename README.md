@@ -26,7 +26,7 @@ Spring Boot Starter For Disruptor
 <dependency>
 	<groupId>com.github.hiwepy</groupId>>
 	<artifactId>disruptor-spring-boot-starter</artifactId>
-	<version>${project.version}</version>
+	<version>2.0.0.RELEASE</version>
 </dependency>
 ```
 
