@@ -23,7 +23,6 @@ import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.spring.boot.event.DisruptorEvent;
 import com.lmax.disruptor.spring.boot.event.factory.DisruptorBindEventFactory;
 import com.lmax.disruptor.spring.boot.event.handler.DisruptorEventDispatcher;
-import com.lmax.disruptor.spring.boot.util.WaitStrategys;
 
 @Configuration
 @ConditionalOnClass({ Disruptor.class })

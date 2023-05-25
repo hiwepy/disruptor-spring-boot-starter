@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ThreadFactory;
 
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -34,7 +35,6 @@ import com.lmax.disruptor.EventTranslatorTwoArg;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.EventHandlerGroup;
-import com.lmax.disruptor.dsl.ProducerType;
 import com.lmax.disruptor.spring.boot.annotation.EventRule;
 import com.lmax.disruptor.spring.boot.config.EventHandlerDefinition;
 import com.lmax.disruptor.spring.boot.config.Ini;
@@ -54,7 +54,6 @@ import com.lmax.disruptor.spring.boot.event.translator.DisruptorEventThreeArgTra
 import com.lmax.disruptor.spring.boot.event.translator.DisruptorEventTwoArgTranslator;
 import com.lmax.disruptor.spring.boot.hooks.DisruptorShutdownHook;
 import com.lmax.disruptor.spring.boot.util.StringUtils;
-import com.lmax.disruptor.spring.boot.util.WaitStrategys;
 
 @Configuration
 @ConditionalOnClass({ Disruptor.class })
@@ -70,17 +69,6 @@ public class DisruptorAutoConfiguration implements ApplicationContextAware {
 	 */
 	private Map<String, String> handlerChainDefinitionMap = new HashMap<String, String>();
 	
-	/**
-	 * 决定一个消费者将如何等待生产者将Event置入Disruptor的策略。用来权衡当生产者无法将新的事件放进RingBuffer时的处理策略。
-	 * （例如：当生产者太快，消费者太慢，会导致生成者获取不到新的事件槽来插入新事件，则会根据该策略进行处理，默认会堵塞）
-	 * @return {@link WaitStrategy} instance
-	 */
-	@Bean
-	@ConditionalOnMissingBean
-	public WaitStrategy waitStrategy() {
-		return WaitStrategys.YIELDING_WAIT;
-	}
-
 	@Bean
 	@ConditionalOnMissingBean
 	public ThreadFactory threadFactory() {
@@ -238,27 +226,27 @@ public class DisruptorAutoConfiguration implements ApplicationContextAware {
 	 * @param disruptorEventHandlers	: 事件分发器
 	 * @return {@link Disruptor} instance
 	 */
-	@Bean
+	@Bean(initMethod = "start")
 	@ConditionalOnClass({ Disruptor.class })
 	@ConditionalOnProperty(prefix = DisruptorProperties.PREFIX, value = "enabled", havingValue = "true")
 	public Disruptor<DisruptorEvent> disruptor(
 			DisruptorProperties properties, 
-			WaitStrategy waitStrategy,
-			ThreadFactory threadFactory, 
 			EventFactory<DisruptorEvent> eventFactory,
 			@Qualifier("disruptorEventHandlers") 
 			List<DisruptorEventDispatcher> disruptorEventHandlers) {
-		
-		// http://blog.csdn.net/a314368439/article/details/72642653?utm_source=itdadao&utm_medium=referral
-			
-		Disruptor<DisruptorEvent> disruptor = null;
-		if (properties.isMultiProducer()) {
-			disruptor = new Disruptor<DisruptorEvent>(eventFactory, properties.getRingBufferSize(), threadFactory,
-					ProducerType.MULTI, waitStrategy);
-		} else {
-			disruptor = new Disruptor<DisruptorEvent>(eventFactory, properties.getRingBufferSize(), threadFactory,
-					ProducerType.SINGLE, waitStrategy);
-		}
+
+		BasicThreadFactory threadFactory = new BasicThreadFactory.Builder()
+				.namingPattern("disruptor-%d")
+				.daemon(true)
+				.priority(Thread.MAX_PRIORITY)
+				.build();
+
+		/**
+		 * 1、初始化 Disruptor
+		 * http://blog.csdn.net/a314368439/article/details/72642653?utm_source=itdadao&utm_medium=referral
+		 */
+		Disruptor<DisruptorEvent> disruptor = new Disruptor<>(eventFactory, properties.getRingBufferSize(), threadFactory,
+					properties.getProducerType(), properties.getWaitStrategy().get());
 
 		if (!ObjectUtils.isEmpty(disruptorEventHandlers)) {
 			
@@ -278,9 +266,6 @@ public class DisruptorAutoConfiguration implements ApplicationContextAware {
 				}
 			}
 		}
-
-		// 启动
-		disruptor.start();
 
 		/**
 		 * 应用退出时，要调用shutdown来清理资源，关闭网络连接，从MetaQ服务器上注销自己
