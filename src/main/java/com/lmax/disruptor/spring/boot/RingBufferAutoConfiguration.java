@@ -3,6 +3,7 @@ package com.lmax.disruptor.spring.boot;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.lmax.disruptor.dsl.ProducerType;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -18,7 +19,6 @@ import com.lmax.disruptor.BatchEventProcessor;
 import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.SequenceBarrier;
-import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.spring.boot.event.DisruptorEvent;
 import com.lmax.disruptor.spring.boot.event.factory.DisruptorBindEventFactory;
@@ -35,12 +35,12 @@ public class RingBufferAutoConfiguration implements ApplicationContextAware {
 	/**
 	 * 决定一个消费者将如何等待生产者将Event置入Disruptor的策略。用来权衡当生产者无法将新的事件放进RingBuffer时的处理策略。
 	 * （例如：当生产者太快，消费者太慢，会导致生成者获取不到新的事件槽来插入新事件，则会根据该策略进行处理，默认会堵塞）
-	 * @return {@link WaitStrategy} instance
+	 * @return {@link com.lmax.disruptor.WaitStrategy} instance
 	 */
 	@Bean
 	@ConditionalOnMissingBean
-	public WaitStrategy waitStrategy() {
-		return WaitStrategys.YIELDING_WAIT;
+	public com.lmax.disruptor.WaitStrategy waitStrategy() {
+		return WaitStrategy.YIELDING_WAIT.get();
 	}
 
 	@Bean
@@ -70,7 +70,7 @@ public class RingBufferAutoConfiguration implements ApplicationContextAware {
 	@Bean
 	@ConditionalOnClass({ RingBuffer.class })
 	@ConditionalOnProperty(prefix = DisruptorProperties.PREFIX, value = "ring-buffer", havingValue = "true")
-	public RingBuffer<DisruptorEvent> ringBuffer(DisruptorProperties properties, WaitStrategy waitStrategy,
+	public RingBuffer<DisruptorEvent> ringBuffer(DisruptorProperties properties, com.lmax.disruptor.WaitStrategy waitStrategy,
 			EventFactory<DisruptorEvent> eventFactory,
 			@Autowired(required = false) DisruptorEventDispatcher preEventHandler,
 			@Autowired(required = false) DisruptorEventDispatcher postEventHandler) {
@@ -83,7 +83,7 @@ public class RingBufferAutoConfiguration implements ApplicationContextAware {
 		 * 第三个参数是RingBuffer的生产都在没有可用区块的时候(可能是消费者（或者说是事件处理器） 太慢了)的等待策略
 		 */
 		RingBuffer<DisruptorEvent> ringBuffer = null;
-		if (properties.isMultiProducer()) {
+		if (ProducerType.MULTI.equals(properties.getProducerType())) {
 			// RingBuffer.createMultiProducer创建一个多生产者的RingBuffer
 			ringBuffer = RingBuffer.createMultiProducer(eventFactory, properties.getRingBufferSize(), waitStrategy);
 		} else {
