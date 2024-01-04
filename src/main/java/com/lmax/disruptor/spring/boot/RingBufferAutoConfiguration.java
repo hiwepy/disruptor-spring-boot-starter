@@ -1,9 +1,14 @@
 package com.lmax.disruptor.spring.boot;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
+import com.lmax.disruptor.BatchEventProcessor;
+import com.lmax.disruptor.EventFactory;
+import com.lmax.disruptor.RingBuffer;
+import com.lmax.disruptor.SequenceBarrier;
+import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
+import com.lmax.disruptor.spring.boot.event.DisruptorEvent;
+import com.lmax.disruptor.spring.boot.event.factory.DisruptorBindEventFactory;
+import com.lmax.disruptor.spring.boot.event.handler.DisruptorEventDispatcher;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -15,14 +20,8 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.lmax.disruptor.BatchEventProcessor;
-import com.lmax.disruptor.EventFactory;
-import com.lmax.disruptor.RingBuffer;
-import com.lmax.disruptor.SequenceBarrier;
-import com.lmax.disruptor.dsl.Disruptor;
-import com.lmax.disruptor.spring.boot.event.DisruptorEvent;
-import com.lmax.disruptor.spring.boot.event.factory.DisruptorBindEventFactory;
-import com.lmax.disruptor.spring.boot.event.handler.DisruptorEventDispatcher;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Configuration
 @ConditionalOnClass({ Disruptor.class })
@@ -31,17 +30,6 @@ import com.lmax.disruptor.spring.boot.event.handler.DisruptorEventDispatcher;
 public class RingBufferAutoConfiguration implements ApplicationContextAware {
 
 	private ApplicationContext applicationContext;
-	
-	/**
-	 * 决定一个消费者将如何等待生产者将Event置入Disruptor的策略。用来权衡当生产者无法将新的事件放进RingBuffer时的处理策略。
-	 * （例如：当生产者太快，消费者太慢，会导致生成者获取不到新的事件槽来插入新事件，则会根据该策略进行处理，默认会堵塞）
-	 * @return {@link com.lmax.disruptor.WaitStrategy} instance
-	 */
-	@Bean
-	@ConditionalOnMissingBean
-	public com.lmax.disruptor.WaitStrategy waitStrategy() {
-		return WaitStrategy.YIELDING_WAIT.get();
-	}
 
 	@Bean
 	@ConditionalOnMissingBean
@@ -61,7 +49,6 @@ public class RingBufferAutoConfiguration implements ApplicationContextAware {
 	 * </p>
 	 * 
 	 * @param properties		：配置参数
-	 * @param waitStrategy		： 一种策略，用来均衡数据生产者和消费者之间的处理效率，默认提供了3个实现类
 	 * @param eventFactory		：  工厂类对象，用于创建一个个的LongEvent， LongEvent是实际的消费数据，初始化启动Disruptor的时候，Disruptor会调用该工厂方法创建一个个的消费数据实例存放到RingBuffer缓冲区里面去，创建的对象个数为ringBufferSize指定的
 	 * @param preEventHandler	：事件前置处理器
 	 * @param postEventHandler	： 事件后置处理器
@@ -70,7 +57,7 @@ public class RingBufferAutoConfiguration implements ApplicationContextAware {
 	@Bean
 	@ConditionalOnClass({ RingBuffer.class })
 	@ConditionalOnProperty(prefix = DisruptorProperties.PREFIX, value = "ring-buffer", havingValue = "true")
-	public RingBuffer<DisruptorEvent> ringBuffer(DisruptorProperties properties, com.lmax.disruptor.WaitStrategy waitStrategy,
+	public RingBuffer<DisruptorEvent> ringBuffer(DisruptorProperties properties,
 			EventFactory<DisruptorEvent> eventFactory,
 			@Autowired(required = false) DisruptorEventDispatcher preEventHandler,
 			@Autowired(required = false) DisruptorEventDispatcher postEventHandler) {
@@ -85,10 +72,10 @@ public class RingBufferAutoConfiguration implements ApplicationContextAware {
 		RingBuffer<DisruptorEvent> ringBuffer = null;
 		if (ProducerType.MULTI.equals(properties.getProducerType())) {
 			// RingBuffer.createMultiProducer创建一个多生产者的RingBuffer
-			ringBuffer = RingBuffer.createMultiProducer(eventFactory, properties.getRingBufferSize(), waitStrategy);
+			ringBuffer = RingBuffer.createMultiProducer(eventFactory, properties.getRingBufferSize(), properties.getWaitStrategy().get());
 		} else {
 			// RingBuffer.createSingleProducer创建一个单生产者的RingBuffer
-			ringBuffer = RingBuffer.createSingleProducer(eventFactory, properties.getRingBufferSize(), waitStrategy);
+			ringBuffer = RingBuffer.createSingleProducer(eventFactory, properties.getRingBufferSize(), properties.getWaitStrategy().get());
 		}
 
 		// 单个处理器

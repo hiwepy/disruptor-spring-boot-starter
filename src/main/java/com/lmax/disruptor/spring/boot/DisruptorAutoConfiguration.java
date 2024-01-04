@@ -219,8 +219,6 @@ public class DisruptorAutoConfiguration implements ApplicationContextAware {
 	 * </p>
 	 * 
 	 * @param properties	: 配置参数
-	 * @param waitStrategy 	: 一种策略，用来均衡数据生产者和消费者之间的处理效率，默认提供了3个实现类
-	 * @param threadFactory	: 线程工厂
 	 * @param eventFactory	: 工厂类对象，用于创建一个个的LongEvent， LongEvent是实际的消费数据，初始化启动Disruptor的时候，Disruptor会调用该工厂方法创建一个个的消费数据实例存放到RingBuffer缓冲区里面去，创建的对象个数为ringBufferSize指定的
 	 * @param disruptorEventHandlers	: 事件分发器
 	 * @return {@link Disruptor} instance
