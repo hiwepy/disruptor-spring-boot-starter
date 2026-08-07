@@ -1,54 +1,15 @@
-# CI workflow for easy4j Spring Boot Starter
-#
-# Triggers:
-#   - push / pull_request on all version-line branches
-#   - manual workflow_dispatch
-#
-# JDK matrix by version line:
-#   - 2.3.x / 2.7.x : JDK 8
-#   - 3.0.x ~ 3.5.x : JDK 17
-#   - 4.0.x / 4.1.x : JDK 17 / 21
-#
-# Runs `mvn -B clean verify` with dependency convergence checks.
 name: CI
 
 on:
   push:
-    branches: [2.3.x, 2.7.x, 3.0.x, 3.1.x, 3.2.x, 3.3.x, 3.4.x, 3.5.x, 4.0.x, 4.1.x, master, main]
+    branches: [2.3.x, 2.7.x, 3.0.x, 3.1.x, 3.2.x, 3.3.x, 3.4.x, 3.5.x, 4.0.x, 4.1.x]
   pull_request:
-    branches: [2.3.x, 2.7.x, 3.0.x, 3.1.x, 3.2.x, 3.3.x, 3.4.x, 3.5.x, 4.0.x, 4.1.x, master, main]
-  workflow_dispatch:
+    branches: [2.3.x, 2.7.x, 3.0.x, 3.1.x, 3.2.x, 3.3.x, 3.4.x, 3.5.x, 4.0.x, 4.1.x]
 
 permissions:
   contents: read
 
 jobs:
   build:
-    name: JDK ${{ matrix.java }} Build & Verify
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    strategy:
-      fail-fast: false
-      matrix:
-        java: [8, 17, 21]
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
-
-      - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: ${{ matrix.java }}
-          cache: maven
-
-      - name: Build and verify
-        run: mvn -B --no-transfer-progress clean verify
-
-      - name: Upload surefire reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: surefire-reports-jdk${{ matrix.java }}
-          path: target/surefire-reports
-          retention-days: 14
+    uses: easy-4-java/.github/.github/workflows/maven-starter-ci.yml@main
+    secrets: inherit
