@@ -12,7 +12,7 @@
     <groupId>io.github.easy4j</groupId>
     <artifactId>disruptor-spring-boot-starter</artifactId>
     <description>Spring Boot Starter For Disruptor</description>
-    <version>3.0.x.20260527-SNAPSHOT</version>
+    <version>3.0.x.20260630-SNAPSHOT</version>
     <name>${project.groupId}:${project.artifactId}</name>
     <url>https://github.com/easy-4-java/${project.artifactId}</url>
     <packaging>jar</packaging>
