@@ -411,7 +411,7 @@
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>17</java.version>
+        <java.version>21</java.version>
         <maven.compiler.release>${java.version}</maven.compiler.release>
         
         <maven.version>3.9.9</maven.version>
