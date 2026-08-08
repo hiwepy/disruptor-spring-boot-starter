@@ -39,22 +39,44 @@ import com.lmax.disruptor.DisruptorTemplate;
 @EnableConfigurationProperties({ DisruptorProperties.class })
 @Slf4j
 @SuppressWarnings({ "unchecked", "rawtypes" })
+/**
+ * Spring Boot auto-configuration for the LMAX Disruptor event-processing framework.
+ * <p>
+ * Registers the {@link Disruptor} instance together with its event factory, event
+ * translators, a {@link DisruptorTemplate}, a Spring {@link ApplicationListener} that
+ * bridges {@link DisruptorApplicationEvent}s into the ring buffer, and a
+ * {@link DisruptorEventAwareProcessor} for injecting the event publisher. The Disruptor
+ * is configured and started when the {@code spring.disruptor.enabled} property is set to
+ * {@code true}.</p>
+ *
+ * @author [@Loong Wan](https://github.com/loong10k)
+ * @since 1.0.0
+ */
 public class DisruptorAutoConfiguration implements ApplicationContextAware {
 
 	private ApplicationContext applicationContext;
 
 
+	/**
+	 * Creates the {@link EventFactory} bean that produces {@link DisruptorEvent}
+	 * instances pre-allocated in the ring buffer.
+	 * @return a {@link DisruptorEventFactory} instance
+	 */
 	@Bean
 	@ConditionalOnMissingBean
 	public EventFactory<DisruptorEvent> eventFactory() {
 		return new DisruptorEventFactory();
 	}
-	
+
 	/**
-	 * 创建 Disruptor
-	 * @param properties	: 配置参数
-	 * @param eventFactory	: 工厂类对象，用于创建一个个的 DisruptorEvent， DisruptorEvent是实际的消费数据，初始化启动Disruptor的时候，Disruptor会调用该工厂方法创建一个个的消费数据实例存放到RingBuffer缓冲区里面去，创建的对象个数为ringBufferSize指定的
-	 * @return {@link Disruptor} instance
+	 * Creates and starts the {@link Disruptor} instance, wiring the discovered event
+	 * handlers into the ring buffer and registering a shutdown hook to clean up resources
+	 * on JVM exit.
+	 * @param properties the Disruptor configuration properties
+	 * @param eventFactory the factory used to pre-allocate {@link DisruptorEvent}
+	 *        instances in the ring buffer (the number of instances equals
+	 *        {@link DisruptorProperties#getRingBufferSize()})
+	 * @return the started {@link Disruptor} instance
 	 */
 	@Bean
 	@ConditionalOnClass({ Disruptor.class })
@@ -66,62 +88,90 @@ public class DisruptorAutoConfiguration implements ApplicationContextAware {
 
 		List<DisruptorEventDispatcher> disruptorEventHandlers = new DisruptorEventHandlerCreater(applicationContext).create(properties);
 		if (!ObjectUtils.isEmpty(disruptorEventHandlers)) {
-			
-			// 进行排序
+
+			// Sort handlers by order.
 			Collections.sort(disruptorEventHandlers, new OrderComparator());
-			
-			// 使用disruptor创建消费者组
+
+			// Build a consumer group using the Disruptor.
 			EventHandlerGroup<DisruptorEvent> handlerGroup = null;
 			for (int i = 0; i < disruptorEventHandlers.size(); i++) {
-				// 连接消费事件方法，其中EventHandler的是为消费者消费消息的实现类
+				// Connect the event handler; EventHandler is the consumer implementation.
 				DisruptorEventDispatcher eventHandler = disruptorEventHandlers.get(i);
 				if(i < 1) {
 					handlerGroup = disruptor.handleEventsWith(eventHandler);
 				} else {
-					// 完成前置事件处理之后执行后置事件处理
+					// Run the next handler after the previous ones complete.
 					handlerGroup.then(eventHandler);
 				}
 			}
 		}
 
-		// 启动
+		// Start the Disruptor.
 		disruptor.start();
 
-		/**
-		 * 应用退出时，要调用shutdown来清理资源，关闭网络连接，从MetaQ服务器上注销自己
-		 * 注意：我们建议应用在JBOSS、Tomcat等容器的退出钩子里调用shutdown方法
-		 */
+		// On application exit, call shutdown to release resources and close connections.
+		// It is recommended to invoke shutdown from container exit hooks (e.g. JBoss,
+		// Tomcat).
 		Runtime.getRuntime().addShutdownHook(new DisruptorShutdownHook(disruptor));
 
 		return disruptor;
 
 	}
-	
+
+	/**
+	 * Creates the single-argument {@link EventTranslatorOneArg} bean used to publish
+	 * events with one argument to the ring buffer.
+	 * @return a {@link DisruptorEventOneArgTranslator} instance
+	 */
 	@Bean
 	@ConditionalOnMissingBean
 	public EventTranslatorOneArg<DisruptorEvent, DisruptorEvent> oneArgEventTranslator() {
 		return new DisruptorEventOneArgTranslator();
 	}
-	
+
+	/**
+	 * Creates the two-argument {@link EventTranslatorTwoArg} bean used to publish events
+	 * with two arguments to the ring buffer.
+	 * @return a {@link DisruptorEventTwoArgTranslator} instance
+	 */
 	@Bean
 	@ConditionalOnMissingBean
 	public EventTranslatorTwoArg<DisruptorEvent, String, String> twoArgEventTranslator() {
 		return new DisruptorEventTwoArgTranslator();
 	}
-	
+
+	/**
+	 * Creates the three-argument {@link EventTranslatorThreeArg} bean used to publish
+	 * events with three arguments to the ring buffer.
+	 * @return a {@link DisruptorEventThreeArgTranslator} instance
+	 */
 	@Bean
 	@ConditionalOnMissingBean
 	public EventTranslatorThreeArg<DisruptorEvent, String, String, String> threeArgEventTranslator() {
 		return new DisruptorEventThreeArgTranslator();
 	}
-	
+
+	/**
+	 * Creates the {@link DisruptorTemplate} bean used as the high-level entry point for
+	 * publishing events to the ring buffer.
+	 * @param disruptor the Disruptor instance
+	 * @param oneArgEventTranslator the single-argument event translator
+	 * @return a new {@link DisruptorTemplate}
+	 */
 	@Bean
 	@ConditionalOnMissingBean
 	public DisruptorTemplate disruptorTemplate(Disruptor<DisruptorEvent> disruptor,
 											   EventTranslatorOneArg<DisruptorEvent, DisruptorEvent> oneArgEventTranslator) {
 		return new DisruptorTemplate(disruptor, oneArgEventTranslator);
 	}
-	
+
+	/**
+	 * Creates the {@link ApplicationListener} bean that bridges Spring
+	 * {@link DisruptorApplicationEvent}s into the Disruptor ring buffer.
+	 * @param disruptor the Disruptor instance
+	 * @param oneArgEventTranslator the single-argument event translator
+	 * @return an application listener that publishes the wrapped event to the ring buffer
+	 */
 	@Bean
 	@ConditionalOnMissingBean
 	public ApplicationListener<DisruptorApplicationEvent> disruptorEventListener(Disruptor<DisruptorEvent> disruptor,
@@ -131,17 +181,31 @@ public class DisruptorAutoConfiguration implements ApplicationContextAware {
             disruptor.publishEvent(oneArgEventTranslator, event);
         };
 	}
-	
+
+	/**
+	 * Creates the {@link DisruptorEventAwareProcessor} bean post-processor that injects
+	 * the Disruptor event publisher into aware beans.
+	 * @return a new {@link DisruptorEventAwareProcessor}
+	 */
 	@Bean
 	public DisruptorEventAwareProcessor disruptorEventAwareProcessor() {
 		return new DisruptorEventAwareProcessor();
 	}
-	
+
+	/**
+	 * Sets the owning Spring {@link ApplicationContext}.
+	 * @param applicationContext the application context
+	 * @throws BeansException in case of context access errors
+	 */
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
 	}
 
+	/**
+	 * Returns the owning Spring {@link ApplicationContext}.
+	 * @return the application context
+	 */
 	public ApplicationContext getApplicationContext() {
 		return applicationContext;
 	}

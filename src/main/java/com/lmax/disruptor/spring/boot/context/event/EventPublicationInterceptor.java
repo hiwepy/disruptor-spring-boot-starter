@@ -25,6 +25,16 @@ import java.lang.reflect.Constructor;
 import com.lmax.disruptor.event.DisruptorEventPublisher;
 import com.lmax.disruptor.event.DisruptorEventPublisherAware;
 
+/**
+ * AOP Alliance {@link MethodInterceptor} that publishes a {@link DisruptorEvent} after
+ * the intercepted method returns successfully.
+ * <p>
+ * The event class must extend {@link DisruptorEvent} and expose a single-argument
+ * constructor accepting the event source (the target object of the invocation).</p>
+ *
+ * @author [@Loong Wan](https://github.com/loong10k)
+ * @since 1.0.0
+ */
 public class EventPublicationInterceptor
 		implements MethodInterceptor, DisruptorEventPublisherAware, InitializingBean {
 
@@ -56,11 +66,19 @@ public class EventPublicationInterceptor
 		}
 	}
 
+	/**
+	 * Sets the {@link DisruptorEventPublisher} used to publish events.
+	 * @param applicationEventPublisher the event publisher
+	 */
 	@Override
 	public void setDisruptorEventPublisher(DisruptorEventPublisher applicationEventPublisher) {
 		this.applicationEventPublisher = applicationEventPublisher;
 	}
 
+	/**
+	 * Validates that an application event class has been configured.
+	 * @throws Exception if the application event class was not set
+	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		if (this.applicationEventClassConstructor == null) {
@@ -68,6 +86,13 @@ public class EventPublicationInterceptor
 		}
 	}
 
+	/**
+	 * Proceeds with the intercepted method invocation and, on successful return, publishes
+	 * a new {@link DisruptorEvent} built from the invocation target.
+	 * @param invocation the method invocation being intercepted
+	 * @return the result of proceeding with the invocation
+	 * @throws Throwable if the invocation or event publication fails
+	 */
 	@Override
 	public Object invoke(MethodInvocation invocation) throws Throwable {
 		Object retVal = invocation.proceed();

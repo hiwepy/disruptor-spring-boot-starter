@@ -23,17 +23,31 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+/**
+ * {@link BeanPostProcessor} that injects the {@link DisruptorEventPublisher} into beans
+ * implementing {@link DisruptorEventPublisherAware}.
+ *
+ * @author [@Loong Wan](https://github.com/loong10k)
+ * @since 1.0.0
+ */
 public class DisruptorEventAwareProcessor implements ApplicationContextAware ,BeanPostProcessor, InitializingBean {
 
 	private DisruptorApplicationContext disruptorContext;
 	private ApplicationContext applicationContext;
 
 	/**
-	 * Create a new ApplicationContextAwareProcessor for the given context.
+	 * Create a new DisruptorEventAwareProcessor.
 	 */
 	public DisruptorEventAwareProcessor() {
 	}
-	
+
+	/**
+	 * Invokes the relevant Aware callbacks on the bean before it is initialized.
+	 * @param bean the bean instance
+	 * @param beanName the name of the bean
+	 * @return the bean instance, possibly modified
+	 * @throws BeansException in case of errors
+	 */
 	@Override
 	public Object postProcessBeforeInitialization(final Object bean, String beanName) throws BeansException {
 		if (bean instanceof Aware) {
@@ -41,24 +55,45 @@ public class DisruptorEventAwareProcessor implements ApplicationContextAware ,Be
 		}
 		return bean;
 	}
-	
+
+	/**
+	 * Injects the Disruptor event publisher into beans that implement
+	 * {@link DisruptorEventPublisherAware}.
+	 * @param bean the bean instance to process
+	 */
 	protected void invokeAwareInterfaces(Object bean) {
 		if (bean instanceof DisruptorEventPublisherAware disruptorEventPublisherAware) {
 			disruptorEventPublisherAware.setDisruptorEventPublisher( this.disruptorContext );
 		}
 	}
 
+	/**
+	 * Returns the bean unchanged after initialization.
+	 * @param bean the bean instance
+	 * @param beanName the name of the bean
+	 * @return the bean instance
+	 */
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) {
 		return bean;
 	}
 
+	/**
+	 * Initializes the {@link DisruptorApplicationContext} once all properties have been
+	 * set.
+	 * @throws Exception if initialization fails
+	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		disruptorContext = new DisruptorApplicationContext();
 		disruptorContext.setApplicationContext(applicationContext);
 	}
 
+	/**
+	 * Sets the owning Spring {@link ApplicationContext}.
+	 * @param applicationContext the application context
+	 * @throws BeansException in case of context access errors
+	 */
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;

@@ -10,6 +10,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Configuration properties for the LMAX Disruptor integration, bound to the
+ * {@code spring.disruptor} prefix.
+ *
+ * @author [@Loong Wan](https://github.com/loong10k)
+ * @since 1.0.0
+ */
 @ConfigurationProperties(DisruptorProperties.PREFIX)
 @Data
 public class DisruptorProperties {
@@ -23,19 +30,21 @@ public class DisruptorProperties {
 	private DisruptorWaitStrategy waitStrategy = DisruptorWaitStrategy.YIELDING_WAIT;
    	private ProducerType producerType = ProducerType.SINGLE;
 
-	/** 是否自动创建RingBuffer对象 */
+	/** Whether to automatically create the RingBuffer object. */
 	private boolean ringBuffer = false;
-	/** RingBuffer缓冲区大小, 默认 1024 */
+	/** RingBuffer buffer size, default 1024. */
 	private int ringBufferSize = 1024;
 
 	private int maxBatchSize = Integer.MAX_VALUE;
-	/** 消息消费线程池大小, 默认 4 */
+	/** Message consumer thread pool size, default 4. */
 	private int ringThreadNumbers = 4;
-	/** 是否对生产者，如果是则通过 RingBuffer.createMultiProducer创建一个多生产者的RingBuffer，否则通过RingBuffer.createSingleProducer创建一个单生产者的RingBuffer */
+	/** Whether to use multiple producers; when true a multi-producer RingBuffer is
+	 *  created via RingBuffer.createMultiProducer, otherwise a single-producer RingBuffer
+	 *  is created via RingBuffer.createSingleProducer. */
 	private boolean multiProducer = false;
 
 
-	/** 消息出来责任链 */
+	/** Message-processing handler chain. */
 	private List<EventHandlerDefinition> handlerDefinitions = new ArrayList<EventHandlerDefinition>();
 
 

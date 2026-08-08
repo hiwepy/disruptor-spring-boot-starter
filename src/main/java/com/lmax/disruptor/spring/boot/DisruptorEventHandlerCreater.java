@@ -20,7 +20,12 @@ import org.springframework.util.ObjectUtils;
 import java.util.*;
 
 /**
- * DisruptorEventHandlerCreater
+ * Discovers {@link DisruptorHandler} beans from the Spring application context and builds
+ * the ordered list of {@link DisruptorEventDispatcher}s used by the Disruptor, applying
+ * any configured handler-chain definitions.
+ *
+ * @author [@Loong Wan](https://github.com/loong10k)
+ * @since 1.0.0
  */
 @Slf4j
 public class DisruptorEventHandlerCreater {
@@ -28,20 +33,20 @@ public class DisruptorEventHandlerCreater {
     private final ApplicationContext applicationContext;
 
     /**
-     * 处理器链定义
+     * Handler-chain definitions mapping event rules to handler bean names.
      */
     private Map<String, String> handlerChainDefinitionMap = new HashMap<String, String>();
 
     /**
-     * 构造函数
-     * @param applicationContext : Spring应用上下文
+     * Constructs a new creator with the given Spring application context.
+     * @param applicationContext the Spring application context used to look up handlers
      */
     public DisruptorEventHandlerCreater(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
 
     /**
-     * 获取Spring应用上下文
+     * Returns the Spring application context.
      * @return {@link ApplicationContext} instance
      */
     public ApplicationContext getApplicationContext() {
@@ -50,7 +55,8 @@ public class DisruptorEventHandlerCreater {
 
 
     /**
-     * 获取事件处理器
+     * Discovers the registered {@link DisruptorHandler} beans, skipping
+     * {@link DisruptorEventDispatcher} entry-point implementations.
      * @return {@link Map<String, DisruptorHandler<DisruptorEvent>>} instance
      */
     protected Map<String, DisruptorHandler<DisruptorEvent>> getEventHandlers() {
@@ -63,13 +69,13 @@ public class DisruptorEventHandlerCreater {
             while (ite.hasNext()) {
                 Map.Entry<String, DisruptorHandler> entry = ite.next();
                 if (entry.getValue() instanceof DisruptorEventDispatcher) {
-                    // 跳过入口实现类
+                    // Skip the entry-point dispatcher implementations.
                     continue;
                 }
 
                 EventRule annotationType = getApplicationContext().findAnnotationOnBean(entry.getKey(), EventRule.class);
                 if(annotationType == null) {
-                    // 注解为空，则打印错误信息
+                    // No annotation found: log an error message.
                     log.error("Not Found AnnotationType {0} on Bean {1} Whith Name {2}", EventRule.class, entry.getValue().getClass(), entry.getKey());
                 } else {
                     handlerChainDefinitionMap.put(annotationType.value(), entry.getKey());
@@ -85,18 +91,19 @@ public class DisruptorEventHandlerCreater {
     }
 
     /**
-     * 创建 DisruptorEventHandler
-     * @param properties : 配置参数
+     * Creates the ordered list of {@link DisruptorEventDispatcher}s, using the default
+     * rule when no handler definitions are configured.
+     * @param properties the Disruptor configuration properties
      * @return {@link List<DisruptorEventDispatcher>} instance
      */
     public List<DisruptorEventDispatcher> create(DisruptorProperties properties) {
-        // 获取处理器集合
+        // Collect the registered handlers.
         Map<String, DisruptorHandler<DisruptorEvent>> eventHandlers = this.getEventHandlers();
-        // 获取定义 拦截链规则
+        // Retrieve the configured handler-chain rules.
         List<EventHandlerDefinition> handlerDefinitions = properties.getHandlerDefinitions();
-        // 拦截器集合
+        // The resulting dispatcher list.
         List<DisruptorEventDispatcher> disruptorEventHandlers = new ArrayList<DisruptorEventDispatcher>();
-        // 未定义，则使用默认规则
+        // Fall back to the default rule when no definitions are provided.
         if (CollectionUtils.isEmpty(handlerDefinitions)) {
 
             EventHandlerDefinition definition = new EventHandlerDefinition();
@@ -104,28 +111,29 @@ public class DisruptorEventHandlerCreater {
             definition.setOrder(0);
             definition.setDefinitionMap(handlerChainDefinitionMap);
 
-            // 构造DisruptorEventHandler
+            // Build the DisruptorEventHandler.
             disruptorEventHandlers.add(this.createDisruptorEventHandler(definition, eventHandlers));
 
         } else {
-            // 迭代拦截器规则
+            // Iterate over the configured handler-chain rules.
             for (EventHandlerDefinition handlerDefinition : handlerDefinitions) {
 
-                // 构造DisruptorEventHandler
+                // Build the DisruptorEventHandler.
                 disruptorEventHandlers.add(this.createDisruptorEventHandler(handlerDefinition, eventHandlers));
 
             }
         }
-        // 进行排序
+        // Sort the resulting handlers by order.
         Collections.sort(disruptorEventHandlers, new OrderComparator());
 
         return disruptorEventHandlers;
     }
 
     /**
-     * 创建 DisruptorEventHandler
-     * @param handlerDefinition : 拦截器规则
-     * @param eventHandlers : 处理器集合
+     * Creates a single {@link DisruptorEventDispatcher} for the given definition and
+     * handler set.
+     * @param handlerDefinition the handler-chain rule
+     * @param eventHandlers the available handlers
      * @return {@link DisruptorEventDispatcher} instance
      */
     protected DisruptorEventDispatcher createDisruptorEventHandler(EventHandlerDefinition handlerDefinition,
@@ -144,8 +152,8 @@ public class DisruptorEventHandlerCreater {
     }
 
     /**
-     * 解析拦截链规则
-     * @param definitions : 拦截链规则
+     * Parses the handler-chain rules from an INI-style definition string.
+     * @param definitions the handler-chain rule definitions
      * @return {@link Map<String, String>} instance
      */
     protected Map<String, String> parseHandlerChainDefinitions(String definitions) {
@@ -159,9 +167,10 @@ public class DisruptorEventHandlerCreater {
     }
 
     /**
-     * 创建 HandlerChainManager
-     * @param eventHandlers : 处理器集合
-     * @param handlerChainDefinitionMap : 拦截链规则
+     * Builds the {@link HandlerChainManager} from the available handlers and the
+     * handler-chain definitions.
+     * @param eventHandlers the available handlers
+     * @param handlerChainDefinitionMap the handler-chain rules
      * @return {@link HandlerChainManager<DisruptorEvent>} instance
      */
     protected HandlerChainManager<DisruptorEvent> createHandlerChainManager(
@@ -182,7 +191,7 @@ public class DisruptorEventHandlerCreater {
 
         if (!CollectionUtils.isEmpty(handlerChainDefinitionMap)) {
             for (Map.Entry<String, String> entry : handlerChainDefinitionMap.entrySet()) {
-                // ant匹配规则
+                // Ant-style matching rule.
                 String rule = entry.getKey();
                 String chainDefinition = entry.getValue();
                 manager.createChain(rule, chainDefinition);

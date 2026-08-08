@@ -18,26 +18,46 @@ package com.lmax.disruptor.spring.boot.event;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
+/**
+ * Spring {@link ApplicationEvent} wrapping a {@link DisruptorEvent}, optionally carrying a
+ * bound data object.
+ *
+ * @author [@Loong Wan](https://github.com/loong10k)
+ * @since 1.0.0
+ */
 @Getter
 public class DisruptorApplicationEvent extends ApplicationEvent {
 
 	/**
-	 * 当前事件绑定的数据对象
+	 * The data object bound to this event.
 	 */
 	protected Object bind;
 
+	/**
+	 * Constructs a new event with the given source and bound data object.
+	 * @param source the component that published the event
+	 * @param bind the data object bound to this event
+	 */
 	public DisruptorApplicationEvent(Object source, Object bind) {
 		super(source);
 		this.bind = bind;
 	}
-	
+
+	/**
+	 * Constructs a new event with the given source and no bound data object.
+	 * @param source the component that published the event
+	 */
 	public DisruptorApplicationEvent(Object source) {
 		super(source);
 	}
 
+	/**
+	 * Binds the given data object to this event.
+	 * @param bind the data object to bind
+	 */
     public void bind(Object bind) {
 		this.bind = bind;
 	}
-	
-	
+
+
 }

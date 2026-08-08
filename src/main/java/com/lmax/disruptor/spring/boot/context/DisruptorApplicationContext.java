@@ -23,24 +23,46 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+/**
+ * Application-context-aware implementation of {@link DisruptorEventPublisher} that
+ * publishes {@link DisruptorEvent}s by wrapping them in a Spring
+ * {@link DisruptorApplicationEvent}.
+ *
+ * @author [@Loong Wan](https://github.com/loong10k)
+ * @since 1.0.0
+ */
 public class DisruptorApplicationContext implements ApplicationContextAware, DisruptorEventPublisher {
 
 	protected ApplicationContext applicationContext;
-	
+
+	/**
+	 * Publishes the given {@link DisruptorEvent} by delegating to the Spring application
+	 * context wrapped in a {@link DisruptorApplicationEvent}.
+	 * @param event the Disruptor event to publish
+	 */
 	@Override
 	public void publishEvent(DisruptorEvent event) {
 		applicationContext.publishEvent(new DisruptorApplicationEvent(event));
 	}
-	
+
+	/**
+	 * Sets the owning Spring {@link ApplicationContext}.
+	 * @param applicationContext the application context
+	 * @throws BeansException in case of context access errors
+	 */
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
 	}
 
+	/**
+	 * Returns the owning Spring {@link ApplicationContext}.
+	 * @return the application context
+	 */
 	public ApplicationContext getApplicationContext() {
 		return applicationContext;
 	}
-	
+
 }
 	
 
