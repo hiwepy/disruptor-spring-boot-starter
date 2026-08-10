@@ -22,7 +22,7 @@ import org.springframework.context.ApplicationEvent;
  * Spring {@link ApplicationEvent} wrapping a {@link DisruptorEvent}, optionally carrying a
  * bound data object.
  *
- * @author [@Loong Wan](https://github.com/loong10k)
+ * @author <a href="https://github.com/loong10k">Loong Wan</a>
  * @since 1.0.0
  */
 @Getter

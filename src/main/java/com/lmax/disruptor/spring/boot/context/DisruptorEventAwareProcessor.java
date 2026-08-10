@@ -27,7 +27,7 @@ import org.springframework.context.ApplicationContextAware;
  * {@link BeanPostProcessor} that injects the {@link DisruptorEventPublisher} into beans
  * implementing {@link DisruptorEventPublisherAware}.
  *
- * @author [@Loong Wan](https://github.com/loong10k)
+ * @author <a href="https://github.com/loong10k">Loong Wan</a>
  * @since 1.0.0
  */
 public class DisruptorEventAwareProcessor implements ApplicationContextAware ,BeanPostProcessor, InitializingBean {

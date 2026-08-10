@@ -32,7 +32,7 @@ import com.lmax.disruptor.event.DisruptorEventPublisherAware;
  * The event class must extend {@link DisruptorEvent} and expose a single-argument
  * constructor accepting the event source (the target object of the invocation).</p>
  *
- * @author [@Loong Wan](https://github.com/loong10k)
+ * @author <a href="https://github.com/loong10k">Loong Wan</a>
  * @since 1.0.0
  */
 public class EventPublicationInterceptor

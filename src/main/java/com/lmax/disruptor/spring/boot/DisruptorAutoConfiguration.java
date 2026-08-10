@@ -49,7 +49,7 @@ import com.lmax.disruptor.DisruptorTemplate;
  * is configured and started when the {@code spring.disruptor.enabled} property is set to
  * {@code true}.</p>
  *
- * @author [@Loong Wan](https://github.com/loong10k)
+ * @author <a href="https://github.com/loong10k">Loong Wan</a>
  * @since 1.0.0
  */
 public class DisruptorAutoConfiguration implements ApplicationContextAware {

@@ -14,7 +14,7 @@ import java.util.List;
  * Configuration properties for the LMAX Disruptor integration, bound to the
  * {@code spring.disruptor} prefix.
  *
- * @author [@Loong Wan](https://github.com/loong10k)
+ * @author <a href="https://github.com/loong10k">Loong Wan</a>
  * @since 1.0.0
  */
 @ConfigurationProperties(DisruptorProperties.PREFIX)
