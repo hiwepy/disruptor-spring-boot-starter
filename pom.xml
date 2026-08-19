@@ -16,6 +16,7 @@
     <version>4.1.x.20260630-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
+            <url>https://github.com/loong10k</url>
     <description>Spring Boot Starter For Disruptor</description>
     <url>https://github.com/easy-4-java/${project.artifactId}</url>
 
