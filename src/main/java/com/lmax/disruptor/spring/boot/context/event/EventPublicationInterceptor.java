@@ -71,6 +71,7 @@ public class EventPublicationInterceptor
 	 * @param applicationEventPublisher the event publisher
 	 */
 	@Override
+	/** @param applicationEventPublisher set the disruptor event publisher. */
 	public void setDisruptorEventPublisher(DisruptorEventPublisher applicationEventPublisher) {
 		this.applicationEventPublisher = applicationEventPublisher;
 	}
@@ -80,6 +81,9 @@ public class EventPublicationInterceptor
 	 * @throws Exception if the application event class was not set
 	 */
 	@Override
+	/**
+	 * <p>After properties set.</p>
+	 */
 	public void afterPropertiesSet() throws Exception {
 		if (this.applicationEventClassConstructor == null) {
 			throw new IllegalArgumentException("applicationEventClass is required");
@@ -94,6 +98,11 @@ public class EventPublicationInterceptor
 	 * @throws Throwable if the invocation or event publication fails
 	 */
 	@Override
+	/**
+	 * <p>Invoke.</p>
+	 * @param invocation
+	 * @return the result
+	 */
 	public Object invoke(MethodInvocation invocation) throws Throwable {
 		Object retVal = invocation.proceed();
 		DisruptorEvent event = (DisruptorEvent) this.applicationEventClassConstructor.newInstance(new Object[] {invocation.getThis()});

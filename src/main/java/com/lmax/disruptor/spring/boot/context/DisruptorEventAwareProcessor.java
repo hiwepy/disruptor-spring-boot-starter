@@ -49,6 +49,12 @@ public class DisruptorEventAwareProcessor implements ApplicationContextAware ,Be
 	 * @throws BeansException in case of errors
 	 */
 	@Override
+	/**
+	 * <p>Post process before initialization.</p>
+	 * @param bean
+	 * @param beanName
+	 * @return the result
+	 */
 	public Object postProcessBeforeInitialization(final Object bean, String beanName) throws BeansException {
 		if (bean instanceof Aware) {
 			invokeAwareInterfaces(bean);
@@ -74,6 +80,12 @@ public class DisruptorEventAwareProcessor implements ApplicationContextAware ,Be
 	 * @return the bean instance
 	 */
 	@Override
+	/**
+	 * <p>Post process after initialization.</p>
+	 * @param bean
+	 * @param beanName
+	 * @return the result
+	 */
 	public Object postProcessAfterInitialization(Object bean, String beanName) {
 		return bean;
 	}
@@ -84,6 +96,9 @@ public class DisruptorEventAwareProcessor implements ApplicationContextAware ,Be
 	 * @throws Exception if initialization fails
 	 */
 	@Override
+	/**
+	 * <p>After properties set.</p>
+	 */
 	public void afterPropertiesSet() throws Exception {
 		disruptorContext = new DisruptorApplicationContext();
 		disruptorContext.setApplicationContext(applicationContext);
@@ -95,6 +110,7 @@ public class DisruptorEventAwareProcessor implements ApplicationContextAware ,Be
 	 * @throws BeansException in case of context access errors
 	 */
 	@Override
+	/** @param applicationContext set the application context. */
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
 	}

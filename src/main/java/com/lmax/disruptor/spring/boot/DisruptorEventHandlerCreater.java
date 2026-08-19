@@ -28,6 +28,11 @@ import java.util.*;
  * @since 1.0.0
  */
 @Slf4j
+/**
+ * <p>Auto-configuration for DisruptorEventHandlerCreater.</p>
+ * @author <a href="https://github.com/loong10k">Loong Wan</a>
+ * @since 1.0.0
+ */
 public class DisruptorEventHandlerCreater {
 
     private final ApplicationContext applicationContext;

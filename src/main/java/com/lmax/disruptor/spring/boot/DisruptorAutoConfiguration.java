@@ -64,6 +64,10 @@ public class DisruptorAutoConfiguration implements ApplicationContextAware {
 	 */
 	@Bean
 	@ConditionalOnMissingBean
+	/**
+	 * <p>Event factory.</p>
+	 * @return the result
+	 */
 	public EventFactory<DisruptorEvent> eventFactory() {
 		return new DisruptorEventFactory();
 	}
@@ -125,6 +129,10 @@ public class DisruptorAutoConfiguration implements ApplicationContextAware {
 	 */
 	@Bean
 	@ConditionalOnMissingBean
+	/**
+	 * <p>One arg event translator.</p>
+	 * @return the result
+	 */
 	public EventTranslatorOneArg<DisruptorEvent, DisruptorEvent> oneArgEventTranslator() {
 		return new DisruptorEventOneArgTranslator();
 	}
@@ -136,6 +144,10 @@ public class DisruptorAutoConfiguration implements ApplicationContextAware {
 	 */
 	@Bean
 	@ConditionalOnMissingBean
+	/**
+	 * <p>Two arg event translator.</p>
+	 * @return the result
+	 */
 	public EventTranslatorTwoArg<DisruptorEvent, String, String> twoArgEventTranslator() {
 		return new DisruptorEventTwoArgTranslator();
 	}
@@ -147,6 +159,10 @@ public class DisruptorAutoConfiguration implements ApplicationContextAware {
 	 */
 	@Bean
 	@ConditionalOnMissingBean
+	/**
+	 * <p>Three arg event translator.</p>
+	 * @return the result
+	 */
 	public EventTranslatorThreeArg<DisruptorEvent, String, String, String> threeArgEventTranslator() {
 		return new DisruptorEventThreeArgTranslator();
 	}
@@ -188,6 +204,10 @@ public class DisruptorAutoConfiguration implements ApplicationContextAware {
 	 * @return a new {@link DisruptorEventAwareProcessor}
 	 */
 	@Bean
+	/**
+	 * <p>Disruptor event aware processor.</p>
+	 * @return the result
+	 */
 	public DisruptorEventAwareProcessor disruptorEventAwareProcessor() {
 		return new DisruptorEventAwareProcessor();
 	}
@@ -198,6 +218,7 @@ public class DisruptorAutoConfiguration implements ApplicationContextAware {
 	 * @throws BeansException in case of context access errors
 	 */
 	@Override
+	/** @param applicationContext set the application context. */
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
 	}

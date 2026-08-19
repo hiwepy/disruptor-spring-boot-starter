@@ -19,6 +19,11 @@ import java.util.List;
  */
 @ConfigurationProperties(DisruptorProperties.PREFIX)
 @Data
+/**
+ * <p>Auto-configuration for DisruptorProperties.</p>
+ * @author <a href="https://github.com/loong10k">Loong Wan</a>
+ * @since 1.0.0
+ */
 public class DisruptorProperties {
 
 	public static final String PREFIX = "spring.disruptor";

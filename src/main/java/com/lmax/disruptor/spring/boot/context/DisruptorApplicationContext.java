@@ -41,6 +41,10 @@ public class DisruptorApplicationContext implements ApplicationContextAware, Dis
 	 * @param event the Disruptor event to publish
 	 */
 	@Override
+	/**
+	 * <p>Publish event.</p>
+	 * @param event
+	 */
 	public void publishEvent(DisruptorEvent event) {
 		applicationContext.publishEvent(new DisruptorApplicationEvent(event));
 	}
@@ -51,6 +55,7 @@ public class DisruptorApplicationContext implements ApplicationContextAware, Dis
 	 * @throws BeansException in case of context access errors
 	 */
 	@Override
+	/** @param applicationContext set the application context. */
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
 	}
